@@ -1,73 +1,43 @@
-# React + TypeScript + Vite
+# Write.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Editorial blog front-end — a writing journal presented as a timeline.
+Posts are nodes on a vertical spine, grouped by month. Serif titles
+(the literary voice) paired with monospace timestamps (the log voice),
+set in ink on paper.
 
-Currently, two official plugins are available:
+> This package is **style only** — no state, no handlers, no data fetching.
+> `src/data/posts.ts` holds static placeholder content you can replace.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Run
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Structure
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+  index.css                 design tokens, reset, base type, keyframes
+  App.tsx / App.css         page "sheet" layout + footer
+  components/
+    Header.tsx / .css        brand wordmark + (inert) action buttons
+    MonthSection.tsx / .css   month label + timeline list
+    PostItem.tsx / .css       one timeline entry (node + rail + title + meta)
+    icons.tsx                 inline Moon / Home SVGs
+  data/posts.ts             static placeholder content
+```
+
+## Responsive
+
+Desktop shows a centered paper sheet on a warm off-white desk.
+At `max-width: 640px` it collapses to the mobile prototype: full-bleed
+white page, brand centered with actions pinned right, tighter timeline.
+
+## Effects (deliberately light)
+
+- Staggered fade-up of months & posts on load (pure CSS, respects `prefers-reduced-motion`)
+- Hover: the timeline node "inks in" and the title darkens & nudges right
+- Sticky header that content slides under
+- Soft light pooling behind the sheet

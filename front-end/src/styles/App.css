@@ -1,0 +1,64 @@
+.wr-page {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  padding: 48px 24px 96px;
+  /* soft light pooling at the top — quiet atmosphere, nothing heavy */
+  background: radial-gradient(125% 80% at 50% -12%, #faf9f6 0%, var(--desk) 58%);
+}
+
+.wr-sheet {
+  width: 100%;
+  max-width: var(--sheet-max);
+  padding: 38px 56px 52px;
+  background: var(--paper);
+  border: 1px solid var(--hair);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.02),
+    0 26px 64px -30px rgba(40, 33, 22, 0.3);
+  animation: wr-fade-up 0.6s var(--ease) both;
+}
+
+.wr-feed {
+  margin-top: 22px;
+}
+
+.wr-footer {
+  margin-top: 60px;
+  padding-top: 22px;
+  border-top: 1px solid var(--hair);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.wr-footer-mark {
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--ink);
+}
+.wr-footer-note {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* ---- mobile: the sheet becomes the full page (like the prototype) --- */
+@media (max-width: 640px) {
+  .wr-page {
+    padding: 0;
+    background: var(--paper);
+  }
+  .wr-sheet {
+    min-height: 100dvh;
+    padding: 20px 18px 40px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .wr-feed {
+    margin-top: 16px;
+  }
+}
