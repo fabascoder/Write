@@ -1,11 +1,13 @@
 import Header from './components/Header'
 import MonthSection from './components/MonthSection'
 import { months } from './data/posts'
+
 import './App.css'
 
 function App() {
   return (
-    <div className="wr-page" id="top">
+   
+      <div className="wr-page" id="top">
       <div className="wr-sheet">
         <Header />
 
@@ -14,13 +16,14 @@ function App() {
             <MonthSection key={month.id} month={month} />
           ))}
         </main>
-
         <footer className="wr-footer">
           <span className="wr-footer-mark">Write.</span>
           <span className="wr-footer-note">fim do arquivo</span>
         </footer>
       </div>
     </div>
+   
+    
   )
 }
 
