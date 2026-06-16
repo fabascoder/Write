@@ -1,6 +1,6 @@
 import type { Month } from '../data/posts'
 import PostItem from './PostItem'
-import '../styles/MonthSection.css'
+import './MonthSection.css'
 
 export default function MonthSection({ month }: { month: Month }) {
   return (

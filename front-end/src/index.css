@@ -1,0 +1,80 @@
+/* =====================================================================
+   Write. — design tokens & base styles
+   Palette: ink on paper. A writing journal told as a timeline.
+   ===================================================================== */
+
+:root {
+  /* paper & ink */
+  --paper: #ffffff;            /* the sheet / reading surface     */
+  --desk: #f4f2ee;             /* warm off-white behind the sheet */
+  --ink: #15120e;              /* primary headings (Write., months) */
+  --ink-soft: #8c847a;         /* post titles — read, warm gray   */
+  --ink-faint: #aaa298;        /* metadata — quietest voice       */
+  --line: #d9d3c8;             /* timeline rule + node rings       */
+  --hair: #ece8e1;             /* hairline borders                 */
+  --wash: #f3f0ea;             /* hover wash on controls           */
+
+  /* type roles */
+  --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "Courier New", monospace;
+
+  /* layout */
+  --sheet-max: 880px;
+  --gutter: 42px;              /* left lane reserved for the timeline */
+  --gutter-x: 13px;            /* x of the rail / node centers        */
+  --node: 11px;                /* node ring diameter                  */
+  --node-y: 22px;              /* node center, aligned to title line  */
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--desk);
+  color: var(--ink);
+  font-family: var(--sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ---- motion ---------------------------------------------------------- */
+@keyframes wr-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

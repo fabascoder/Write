@@ -1,7 +1,7 @@
 import Header from './components/Header'
 import MonthSection from './components/MonthSection'
 import { months } from './data/posts'
-import './styles/App.css'
+import './App.css'
 
 function App() {
   return (

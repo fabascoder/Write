@@ -1,5 +1,5 @@
 import type { Post } from '../data/posts'
-import '../styles/PostItem.css'
+import './PostItem.css'
 
 export default function PostItem({ post }: { post: Post }) {
   return (
