@@ -1,43 +1,53 @@
+<p align="center">
+  <img src="docs/banner.png" alt="Write. — um blog pessoal" width="100%">
+</p>
+
 # Write.
 
-Editorial blog front-end — a writing journal presented as a timeline.
-Posts are nodes on a vertical spine, grouped by month. Serif titles
-(the literary voice) paired with monospace timestamps (the log voice),
-set in ink on paper.
+Front-end de um blog pessoal de escrita: cada post é um nó numa linha do tempo,
+agrupado por mês — título em serifa, data em monoespaçada, tinta sobre papel.
 
-> This package is **style only** — no state, no handlers, no data fetching.
-> `src/data/posts.ts` holds static placeholder content you can replace.
+<p align="center">
+  <a href="https://write-w.vercel.app"><strong>🔗 Acessar o site →</strong></a>
+</p>
 
-## Run
+## Propósito
+
+Um espaço calmo para escrever ao longo do tempo. Em vez de uma lista comum, os
+textos aparecem como uma **linha do tempo**, o que dá um sentido de continuidade
+— da escrita mais recente à mais antiga. Por enquanto é a camada visual
+(front-end) do projeto.
+
+## Funcionalidades
+
+- **Linha do tempo por mês** — posts como nós conectados por uma linha contínua.
+- **Tipografia com duas vozes** — serifa nos títulos, monoespaçada nas datas.
+- **Responsivo** — folha centralizada no desktop; tela cheia no celular (≤ 640px), como no protótipo.
+- **Efeitos leves** — surgimento em cascata no carregamento, realce no hover e cabeçalho fixo.
+- **Acessível** — foco visível por teclado, rótulos `aria` e respeito a `prefers-reduced-motion`.
+
+## Tecnologias
+
+- **React 19** + **TypeScript**
+- **Vite** (dev e build)
+- **CSS puro** com variáveis de tema
+- **Google Fonts** — Playfair Display · Inter · JetBrains Mono
+- **Deploy:** Vercel
+
+## Preview
+
+<table>
+  <tr>
+    <td width="62%" valign="top"><img src="docs/preview-desktop.png" alt="Desktop" width="100%"></td>
+    <td width="38%" valign="top"><img src="docs/preview-mobile.png" alt="Mobile" width="100%"></td>
+  </tr>
+</table>
+
+## Como rodar
+
+Precisa de [Node.js](https://nodejs.org) 18+.
 
 ```bash
 npm install
-npm run dev
+npm run dev      # http://localhost:5173
 ```
-
-## Structure
-
-```
-src/
-  index.css                 design tokens, reset, base type, keyframes
-  App.tsx / App.css         page "sheet" layout + footer
-  components/
-    Header.tsx / .css        brand wordmark + (inert) action buttons
-    MonthSection.tsx / .css   month label + timeline list
-    PostItem.tsx / .css       one timeline entry (node + rail + title + meta)
-    icons.tsx                 inline Moon / Home SVGs
-  data/posts.ts             static placeholder content
-```
-
-## Responsive
-
-Desktop shows a centered paper sheet on a warm off-white desk.
-At `max-width: 640px` it collapses to the mobile prototype: full-bleed
-white page, brand centered with actions pinned right, tighter timeline.
-
-## Effects (deliberately light)
-
-- Staggered fade-up of months & posts on load (pure CSS, respects `prefers-reduced-motion`)
-- Hover: the timeline node "inks in" and the title darkens & nudges right
-- Sticky header that content slides under
-- Soft light pooling behind the sheet

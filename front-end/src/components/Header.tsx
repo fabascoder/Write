@@ -1,5 +1,5 @@
 import { MoonIcon, HomeIcon } from './icons'
-import '../styles/Header.css'
+import './Header.css'
 
 // Style only: the buttons are intentionally inert (no handlers / no theme
 // state). They carry the visual + accessibility shell for later wiring.
