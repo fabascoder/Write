@@ -4,8 +4,7 @@
 
 # Write.
 
-Front-end de um blog pessoal de escrita: cada post é um nó numa linha do tempo,
-agrupado por mês — título em serifa, data em monoespaçada, tinta sobre papel.
+Write é um blog desenvolvido para uso pessoal, onde o autor piblicará pensamentos, reflexões e poemas. A ideia é fazer com que lembranças e ideais nunca sejam perdidas. Por isso foi criada a Write
 
 <p align="center">
   <a href="https://write-w.vercel.app"><strong>🔗 Acessar o site →</strong></a>
