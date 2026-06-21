@@ -1,27 +1,19 @@
-import Header from './components/Header'
-import MonthSection from './components/MonthSection'
-import { months } from './data/posts'
-import './App.css'
+import { Route, Routes, BrowserRouter } from "react-router-dom";
+import "./App.css";
 
+import Home from "./components/Home";
+import Article from "./components/pages/Article";
+import HomePage from "./components/pages/HomePage";
 function App() {
   return (
-    <div className="wr-page" id="top">
-      <div className="wr-sheet">
-        <Header />
-
-        <main className="wr-feed">
-          {months.map((month) => (
-            <MonthSection key={month.id} month={month} />
-          ))}
-        </main>
-
-        <footer className="wr-footer">
-          <span className="wr-footer-mark">Write.</span>
-          <span className="wr-footer-note">fim do arquivo</span>
-        </footer>
-      </div>
-    </div>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/article" element={<Article />} />
+        <Route path="/homePage" element={<HomePage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

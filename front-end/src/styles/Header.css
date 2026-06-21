@@ -53,6 +53,11 @@
   background: var(--wash);
   border-color: var(--hair);
 }
+.wr-icon-btn--active {
+  background: var(--ink);
+  color: #fff;
+  border-color: transparent;
+}
 .wr-icon-btn:active {
   transform: scale(0.93);
 }
