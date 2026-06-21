@@ -22,3 +22,14 @@ export function HomeIcon() {
     </svg>
   )
 }
+
+export function CalendarIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M6 3h1.5V1.5a.75.75 0 0 1 1.5 0V3h7V1.5a.75.75 0 0 1 1.5 0V3H18a3 3 0 0 1 3 3v13a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a3 3 0 0 1 3-3Zm0 4.5v11.25a.75.75 0 0 0 .75.75h10.5a.75.75 0 0 0 .75-.75V7.5H6Zm0-1.5h12V6a.75.75 0 0 1-.75.75H6.75A.75.75 0 0 1 6 6v-.75Z"
+        fill="currentColor"
+      />
+    </svg>
+  )
+}

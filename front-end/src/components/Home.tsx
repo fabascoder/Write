@@ -2,6 +2,7 @@ import Header from "./Header";
 import MonthSection from "./MonthSection";
 import { months } from "../data/posts";
 import "../App.css";
+import { Footer } from "./Footer";
 // import Article from "./components/pages/Article";
 
 function Home() {
@@ -17,10 +18,7 @@ function Home() {
             ))}
           
           </main>
-          <footer className="wr-footer">
-            <span className="wr-footer-mark">Write.</span>
-            <span className="wr-footer-note">fim do arquivo</span>
-          </footer>
+          <Footer />
         </div>
         {/* <Article /> */}
       </div>
