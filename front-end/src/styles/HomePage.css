@@ -180,16 +180,29 @@
   font-family: var(--wb-serif);
   font-weight: 600;
   font-size: clamp(2.2rem, 6vw, 3.2rem);
-  color: var(--wb-ink);
-  transition: opacity 0.2s ease;
+  color: var(--wb-ink-soft);
+  transition: color 0.25s var(--wb-ease), transform 0.25s var(--wb-ease);
 }
 
 .wb-card-title a {
   color: inherit;
   text-decoration: none;
+  transition: opacity 0.2s var(--wb-ease), transform 0.25s var(--wb-ease);
 }
 
-.wb-card-title a:hover { opacity: 0.78; }
+.wb-card:hover .wb-card-title {
+  color: var(--wb-ink);
+  transform: translateX(2px);
+}
+
+.wb-card-title a:hover {
+  opacity: 0.9;
+  transform: translateX(1px);
+}
+
+.wb-card:hover .wb-tags {
+  opacity: 0.92;
+}
 
 .wb-tags {
   font-family: var(--wb-sans);

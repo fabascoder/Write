@@ -2,6 +2,7 @@
   position: relative;
   padding: 11px 0 11px var(--gutter);
   animation: wr-fade-up 0.55s var(--ease) both;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
 
 /* ---- the timeline spine (signature) --------------------------------- */
@@ -35,6 +36,7 @@
   border: 2px solid var(--line);
   transform: translate(-50%, -50%);
   z-index: 1;
+  margin-top: 5px;
   transition:
     background 0.2s var(--ease),
     border-color 0.2s var(--ease),
@@ -47,6 +49,9 @@
   display: flex;
   align-items: baseline;
   gap: 22px;
+  padding: 0px 18px;
+  border-radius: 18px;
+  transition: background 0.2s var(--ease), transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
 
 .wr-post-title {
@@ -79,6 +84,16 @@
 }
 
 /* ---- hover / focus: the node "inks in", the title darkens ----------- */
+.wr-post:hover {
+  transform: translateY(-2px);
+}
+
+.wr-post:hover .wr-post-link,
+.wr-post:focus-within .wr-post-link {
+  background: rgba(243, 240, 234, 0.55);
+  box-shadow: 0 18px 42px -30px rgba(40, 33, 22, 0.18);
+}
+
 .wr-post:hover .wr-node,
 .wr-post:focus-within .wr-node {
   background: var(--ink);
