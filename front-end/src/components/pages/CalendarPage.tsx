@@ -1,11 +1,10 @@
-import Header from "./Header";
-import MonthSection from "./MonthSection";
-import { months } from "../data/posts";
-import "../App.css";
-import { Footer } from "./Footer";
-// import Article from "./components/pages/Article";
+import Header from "../layout/Header";
+import MonthSection from "../MonthSection";
+import { months } from "../../data/posts";
+import "../../styles/App.css";
+import { Footer } from "../layout/Footer";
 
-function Home() {
+function CalendarPage() {
   return (
     <>
     <div className="wr-page" id="top">
@@ -29,4 +28,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default CalendarPage;

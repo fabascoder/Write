@@ -1,4 +1,4 @@
-import "../App.css";
+import "../../styles/App.css";
 export const Footer = () => {
   return (
     <footer className="wr-footer">

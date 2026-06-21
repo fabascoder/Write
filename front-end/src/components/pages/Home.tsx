@@ -1,7 +1,7 @@
-import Header from "../Header";
-import "../../App.css";
+import Header from "../layout/Header";
+import "../../styles/App.css";
 import "../../styles/HomePage.css";
-import { Footer } from "../Footer";
+import { Footer } from "../layout/Footer";
 import { NavLink } from "react-router-dom";
 
 // Conteúdo apenas para renderização (sem lógica de comportamento).
@@ -10,7 +10,7 @@ const posts = [
   { id: 2, time: "Há 2 horas atrás", date: "14 jun 26", title: "Visão React.", tags: ["Poemas", "Vida"] },
 ];
 
-export default function HomePage() {
+export default function Home() {
   return (
     <div className="wr-page" id="top">
       <div className="wr-sheet">

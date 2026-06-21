@@ -1,13 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
-import { MoonIcon, HomeIcon, CalendarIcon } from "./icons";
-import "../styles/Header.css";
+import { MoonIcon, HomeIcon, CalendarIcon } from "../icons";
+import "../../styles/Header.css";
 
 // Style only: the buttons are intentionally inert (no handlers / no theme
 // state). They carry the visual + accessibility shell for later wiring.
 export default function Header() {
   const location = useLocation();
-  const onHome = location.pathname === "/";
-  const destination = onHome ? "/homePage" : "/";
+  const onCalendarPage = location.pathname === "/";
+  const destination = onCalendarPage ? "/calendarPage" : "/";
 
   return (
     <header className="wr-header">
@@ -26,9 +26,9 @@ export default function Header() {
         <Link
           to={destination}
           className="wr-icon-btn"
-          aria-label={onHome ? "Ir para posts" : "Voltar para a timeline"}
+          aria-label={onCalendarPage ? "Ir para posts" : "Voltar para a timeline"}
         >
-          {onHome ? <HomeIcon /> : <CalendarIcon />}
+          {onCalendarPage ? <HomeIcon /> : <CalendarIcon />}
         </Link>
       </nav>
     </header>
