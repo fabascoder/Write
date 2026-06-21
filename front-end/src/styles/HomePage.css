@@ -1,0 +1,320 @@
+/* =========================================================
+   Write. — Blog de Fabricio A. A. Cruz
+   Estilo baseado na Home. Efeitos sutis e paleta alinhada.
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Quicksand:wght@400;500;600&family=Sacramento&family=Space+Mono&display=swap');
+
+:root {
+  --wb-page-bg: #faf9f6;
+  --wb-surface: #ffffff;
+  --wb-ink: #15120e;
+  --wb-ink-soft: #8c847a;
+  --wb-ink-faint: #aaa298;
+  --wb-desk: #f4f2ee;
+  --wb-hair: #ece8e1;
+  --wb-wash: #f3f0ea;
+
+  --wb-sheet-max: 880px;
+
+  --wb-nav-vida: #2b2b2b;
+  --wb-nav-poemas: #6e7022;
+  --wb-nav-trabalho: #44476b;
+  --wb-nav-romance: #574a70;
+
+  --wb-meta: #3d3d3d;
+  --wb-tag: #a3a3a3;
+  --wb-divider: #dcdcdc;
+
+  --wb-footer-bg: #faf6e8;
+  --wb-footer-ink: #6f6f6f;
+  --wb-signature: #8c8c80;
+
+  --wb-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --wb-round: 'Quicksand', system-ui, sans-serif;
+  --wb-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --wb-mono: 'Space Mono', 'Courier New', Courier, monospace;
+  --wb-script: 'Sacramento', cursive;
+
+  --wb-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ---------- Página ---------- */
+.wb-page {
+  min-height: 100vh;
+  padding: 28px;
+  box-sizing: border-box;
+  background: radial-gradient(125% 80% at 50% -12%, #faf9f6 0%, var(--wb-desk) 58%);
+  font-family: var(--wb-sans);
+  color: var(--wb-ink);
+}
+
+.wb-container {
+  width: 100%;
+  max-width: var(--wb-sheet-max);
+  margin: 0 auto;
+  background: var(--wb-surface);
+  border: 1px solid var(--wb-hair);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.02),
+    0 26px 64px -30px rgba(40, 33, 22, 0.18);
+  animation: wb-fade-up 0.6s var(--wb-ease) both;
+}
+
+/* ---------- Cabeçalho ---------- */
+.wb-header {
+  position: relative;
+  padding: 56px 48px 40px;
+  text-align: center;
+  background: linear-gradient(var(--wb-surface) 72%, rgba(255, 255, 255, 0));
+}
+
+.wb-logo {
+  margin: 0;
+  font-family: var(--wb-serif);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 6vw, 3.4rem);
+  letter-spacing: 0.5px;
+}
+
+.wb-header-icons {
+  position: absolute;
+  top: 56px;
+  right: 48px;
+  display: flex;
+  gap: 18px;
+}
+
+.wb-icon-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: var(--wb-ink);
+  line-height: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.wb-icon-btn:hover { opacity: 0.72; transform: translateY(-1px); }
+.wb-icon-btn svg { width: 26px; height: 26px; }
+
+/* ---------- Navegação ---------- */
+.wb-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px 48px 12px;
+  font-family: var(--wb-round);
+  border-top: 1px solid var(--wb-hair);
+}
+
+.wb-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.wb-nav-link {
+  font-size: clamp(1.1rem, 2.6vw, 1.5rem);
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.wb-nav-link:hover,
+.wb-nav-link:focus-visible {
+  opacity: 0.75;
+  transform: translateY(-1px);
+}
+
+.wb-nav-link.vida     { color: var(--wb-nav-vida); }
+.wb-nav-link.poemas   { color: var(--wb-nav-poemas); }
+.wb-nav-link.trabalho { color: var(--wb-nav-trabalho); }
+.wb-nav-link.romance  { color: var(--wb-nav-romance); }
+
+.wb-nav-arrow {
+  color: var(--wb-tag);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* ---------- Artigos ---------- */
+.wb-articles {
+  padding: 32px 36px 44px;
+}
+
+.wb-card {
+  margin-bottom: 42px;
+  padding: 26px 24px 24px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(236, 232, 225, 0.9);
+  box-shadow: 0 16px 34px -26px rgba(40, 33, 22, 0.22);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  animation: wb-fade-up 0.55s var(--wb-ease) both;
+}
+
+.wb-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 26px 48px -30px rgba(40, 33, 22, 0.22);
+  border-color: rgba(236, 232, 225, 1);
+}
+
+.wb-card:last-child { margin-bottom: 0; }
+
+.wb-meta {
+  font-family: var(--wb-mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: var(--wb-ink-faint);
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+
+.wb-card-title {
+  margin: 0 0 22px;
+  font-family: var(--wb-serif);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 6vw, 3.2rem);
+  color: var(--wb-ink);
+  transition: opacity 0.2s ease;
+}
+
+.wb-card-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.wb-card-title a:hover { opacity: 0.78; }
+
+.wb-tags {
+  font-family: var(--wb-sans);
+  font-size: 1.05rem;
+  color: var(--wb-ink-soft);
+  margin-bottom: 28px;
+}
+
+.wb-tags .dot { margin: 0 10px; }
+
+.wb-divider {
+  border: none;
+  border-top: 1px solid var(--wb-divider);
+  margin: 0 0 0 18px;
+}
+
+/* ---------- Rodapé ---------- */
+.wb-footer {
+  background: var(--wb-footer-bg);
+  padding: 44px 48px 28px;
+  color: var(--wb-footer-ink);
+}
+
+.wb-footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.wb-footer-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wb-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--wb-sans);
+  font-size: 0.95rem;
+  color: var(--wb-footer-ink);
+  transition: opacity 0.2s ease;
+}
+
+.wb-control:hover { opacity: 0.65; }
+.wb-control svg { width: 18px; height: 18px; }
+
+.wb-footer-author {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.wb-author-label {
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  align-self: flex-start;
+}
+
+.wb-signature {
+  font-family: var(--wb-script);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  color: var(--wb-signature);
+  letter-spacing: 2px;
+  line-height: 1;
+  margin: 4px 0 14px;
+  white-space: nowrap;
+}
+
+.wb-socials {
+  display: flex;
+  gap: 26px;
+}
+
+.wb-social {
+  color: var(--wb-signature);
+  line-height: 0;
+  transition: opacity 0.2s ease;
+}
+
+.wb-social:hover { opacity: 0.6; }
+.wb-social svg { width: 22px; height: 22px; }
+
+.wb-copyright {
+  text-align: center;
+  margin-top: 40px;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  color: var(--wb-footer-ink);
+}
+
+/* ---------- Animações ---------- */
+@keyframes wb-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 640px) {
+  .wb-page { padding: 0; background: var(--wb-surface); }
+  .wb-container { min-height: 100vh; padding: 20px 18px 40px; border: none; border-radius: 0; box-shadow: none; }
+  .wb-header { padding: 20px 0 8px; }
+  .wb-header-icons { top: 20px; right: 18px; gap: 12px; }
+  .wb-nav { padding: 18px 0 12px; flex-wrap: wrap; justify-content: center; gap: 18px 22px; }
+  .wb-articles { padding: 24px 0 32px; }
+  .wb-card { padding: 20px 18px 18px; }
+  .wb-footer { padding: 28px 0 20px; }
+  .wb-footer-top { flex-direction: column; align-items: center; text-align: center; gap: 28px; }
+  .wb-author-label { align-self: center; }
+}
+
+/* ---------- Acessibilidade ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
