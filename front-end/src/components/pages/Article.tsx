@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import "../../styles/Article.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Article() {
   const articleRef = useRef(null);
@@ -13,7 +14,7 @@ export default function Article() {
       },
       {
         threshold: 0.2,
-      }
+      },
     );
 
     if (articleRef.current) {
@@ -22,11 +23,15 @@ export default function Article() {
 
     return () => observer.disconnect();
   }, []);
+  const navigate = useNavigate();
+  function handleClick() {
+    navigate("/");
+  }
 
   return (
     <main className="article-container fade-up">
       <div className="article-topo">
-        <button className="article-voltar">
+        <button onClick={handleClick} className="article-voltar">
           ←
         </button>
 
@@ -37,22 +42,17 @@ export default function Article() {
         </div>
       </div>
 
-      <h1 className="article-title">
-        Ceguidão.
-      </h1>
+      <h1 className="article-title">Ceguidão.</h1>
 
       <p className="article-description">
-        Em um mundo cada vez mais conectado, a forma como compartilhamos ideias e
-        experiências evolui constantemente. Este espaço foi criado para reunir
+        Em um mundo cada vez mais conectado, a forma como compartilhamos ideias
+        e experiências evolui constantemente. Este espaço foi criado para reunir
         pensamentos, reflexões e conteúdos diversos em um ambiente simples e
         agradável. A proposta é oferecer uma leitura leve, permitindo que cada
         publicação tenha seu próprio significado e contexto.
       </p>
 
-      <section
-        ref={articleRef}
-        className="article-card"
-      >
+      <section ref={articleRef} className="article-card">
         <h2>Efeitos</h2>
 
         <p className="article-main-text">
