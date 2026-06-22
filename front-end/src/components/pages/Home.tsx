@@ -37,11 +37,11 @@ export default function Home() {
           {/* Artigos */}
           <main className="wb-articles">
             {posts.map((post) => (
-              <NavLink to="/article">
+              <NavLink to="/article" key={post.id}>
                 <article className="wb-card" key={post.id}>
                 <p className="wb-meta">{post.time} | {post.date}</p>
                 <h2 className="wb-card-title">
-                  <a href={`#post-${post.id}`}>{post.title}</a>
+                  <p>{post.title}</p>
                 </h2>
                 <p className="wb-tags">
                   {post.tags.map((tag, i) => (
