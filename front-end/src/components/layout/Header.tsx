@@ -28,7 +28,7 @@ export default function Header() {
           className="wr-icon-btn"
           aria-label={onCalendarPage ? "Ir para posts" : "Voltar para a timeline"}
         >
-          {onCalendarPage ? <HomeIcon /> : <CalendarIcon />}
+          {onCalendarPage ? <CalendarIcon /> : <HomeIcon />}
         </Link>
       </nav>
     </header>
