@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import "../../styles/Article.css";
 import { useNavigate } from "react-router-dom";
+import { Head } from "../layout/Head";
 
 export default function Article() {
   const articleRef = useRef(null);
@@ -25,11 +26,12 @@ export default function Article() {
   }, []);
   const navigate = useNavigate();
   function handleClick() {
-    navigate("/");
+    navigate(-1);
   }
 
   return (
     <main className="article-container fade-up">
+      <Head title="Artigo" description="Esse é o artigo"/>
       <div className="article-topo">
         <button onClick={handleClick} className="article-voltar">
           ←
