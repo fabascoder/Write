@@ -3,6 +3,7 @@ import "../../styles/App.css";
 import "../../styles/HomePage.css";
 import { Footer } from "../layout/Footer";
 import { NavLink } from "react-router-dom";
+import { Head } from "../layout/Head";
 
 // Conteúdo apenas para renderização (sem lógica de comportamento).
 const posts = [
@@ -12,7 +13,9 @@ const posts = [
 
 export default function Home() {
   return (
+
     <div className="wr-page" id="top">
+      <Head title="Home" description="Essa é a página inicial da Write"/>
       <div className="wr-sheet">
         <Header />
 
