@@ -3,6 +3,7 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 
 import "./EditorTexto.css";
+import { API_URL } from "../../lib/api";
 
 export default function EditorTexto() {
   const [texto, setTexto] = useState("");
@@ -17,7 +18,7 @@ export default function EditorTexto() {
     try {
       setSalvando(true);
 
-      const response = await fetch("http://localhost:3000/publicar", {
+      const response = await fetch(`${API_URL}/publicar`, {
         method: "POST",
 
         headers: {

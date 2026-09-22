@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 
 import "../styles/PostItem.css";
+import { API_URL } from "../lib/api";
 
 type Artigo = {
   id: string | number;
@@ -17,7 +18,7 @@ export default function PostItem() {
   useEffect(() => {
     async function consultarArtigos() {
       try {
-        const response = await fetch("http://localhost:3000/consultarArtigos");
+        const response = await fetch(`${API_URL}/documentos`);
 
         if (!response.ok) {
           throw new Error("Erro ao consultar artigos");

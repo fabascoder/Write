@@ -1,6 +1,7 @@
 // Endereço da API. Em produção, defina VITE_API_URL no .env
 import { tempo } from "./format";
-export const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+export const API_URL =
+  import.meta.env.VITE_API_URL ?? "https://writeapi.onrender.com";
 
 export type Artigo = {
   id: string | number;
@@ -19,9 +20,9 @@ export type NovoArtigo = {
   tags?: string[];
 };
 
-// GET /consultarArtigos — mesma rota que você já usa
+// GET /documentos — mesma rota que você já usa
 export async function listarArtigos(): Promise<Artigo[]> {
-  const response = await fetch(`${API_URL}/consultarArtigos`, {
+  const response = await fetch(`${API_URL}/documentos`, {
     headers: { "Content-Type": "application/json" },
   });
 
