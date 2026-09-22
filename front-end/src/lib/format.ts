@@ -18,6 +18,16 @@ export function formatarData(data: DataEntrada) {
   });
 }
 
+// "22 de setembro de 2026"
+export function dataPorExtenso(data: DataEntrada) {
+  if (!tempo(data)) return "sem data";
+  return new Date(data as string).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 // "há 2 horas", "há 3 dias"...
 export function tempoRelativo(data: DataEntrada) {
   const t = tempo(data);
@@ -75,8 +85,13 @@ export function agruparPorMes(artigos: Artigo[]): GrupoMes[] {
       : "sem-data";
 
     if (!grupos.has(chave)) {
+      // "Setembro" no ano corrente; "Setembro de 2025" nos anteriores
+      const mesmoAno = data ? data.getFullYear() === new Date().getFullYear() : false;
       const rotulo = data
-        ? data.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+        ? data.toLocaleDateString("pt-BR", {
+            month: "long",
+            ...(mesmoAno ? {} : { year: "numeric" }),
+          })
         : "Sem data";
       grupos.set(chave, {
         chave,

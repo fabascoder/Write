@@ -1,11 +1,12 @@
 import { useMemo, useState, type KeyboardEvent } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import { publicarArtigo } from "../../lib/api";
 import { CATEGORIAS } from "../../lib/categorias";
 import { lerRascunhos, removerRascunho, salvarRascunho } from "../../lib/rascunhos";
-import { ArrowLeftIcon, CloseIcon } from "../icons";
+import { useAdmin } from "../../hooks/useAdmin";
+import { ArrowLeftIcon, BookIcon, CloseIcon } from "../icons";
 import { Head } from "../layout/Head";
 
 const MODULES = {
@@ -19,13 +20,24 @@ const MODULES = {
   ],
 };
 
-const FORMATS = ["header", "bold", "italic", "underline", "strike", "align", "list", "blockquote", "link"];
+const FORMATS = [
+  "header",
+  "bold",
+  "italic",
+  "underline",
+  "strike",
+  "align",
+  "list",
+  "blockquote",
+  "link",
+];
 
 type Status = { tipo: "ok" | "erro"; texto: string } | null;
 
 export default function Editor() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
+  const { logado } = useAdmin();
 
   const rascunhoInicial = useMemo(() => {
     const id = params.get("rascunho");
@@ -40,6 +52,8 @@ export default function Editor() {
   const [tagDigitada, setTagDigitada] = useState("");
   const [publicando, setPublicando] = useState(false);
   const [status, setStatus] = useState<Status>(null);
+
+  if (!logado) return <Navigate to="/" replace />;
 
   const textoVazio = texto.replace(/<[^>]*>/g, "").trim() === "";
 
@@ -64,8 +78,14 @@ export default function Editor() {
   }
 
   async function publicar() {
-    if (!titulo.trim()) return setStatus({ tipo: "erro", texto: "Dê um título ao texto antes de publicar." });
-    if (textoVazio) return setStatus({ tipo: "erro", texto: "Escreva alguma coisa antes de publicar." });
+    if (!titulo.trim()) {
+      setStatus({ tipo: "erro", texto: "Dê um título ao artigo antes de publicar." });
+      return;
+    }
+    if (textoVazio) {
+      setStatus({ tipo: "erro", texto: "Escreva alguma coisa antes de publicar." });
+      return;
+    }
 
     try {
       setPublicando(true);
@@ -80,45 +100,48 @@ export default function Editor() {
       navigate("/");
     } catch (e) {
       console.error(e);
-      setStatus({ tipo: "erro", texto: "Não foi possível publicar. Confira se a API está rodando." });
+      setStatus({ tipo: "erro", texto: "Não foi possível publicar. Confira se a API está no ar." });
     } finally {
       setPublicando(false);
     }
   }
 
   return (
-    <main className="wr-main">
-      <Head title="Escrever" description="Editor de textos do Write." />
+    <main className="fc-main fc-main--simples fc-editor-pagina">
+      <Head title="Novo artigo" description="Editor do Fabas Coder Blog." />
 
-      <Link to="/" className="wr-back">
-        <ArrowLeftIcon />
-        Voltar
-      </Link>
-      <h1 className="wr-page-title">{rascunhoInicial ? "Continuar rascunho" : "Novo texto"}</h1>
+      <div className="fc-topo">
+        <Link to="/" className="fc-voltar" aria-label="Voltar">
+          <ArrowLeftIcon />
+        </Link>
+        <Link to="/rascunhos" className="fc-btn fc-btn--contorno">
+          <BookIcon />
+          Rascunhos
+        </Link>
+      </div>
 
-      <div className="wr-editor">
-        <div className="wr-editor-paper">
-          <input
-            className="wr-editor-title"
-            placeholder="Título do texto"
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
-            aria-label="Título"
-          />
-          <ReactQuill
-            theme="snow"
-            value={texto}
-            onChange={setTexto}
-            modules={MODULES}
-            formats={FORMATS}
-            placeholder="Comece a escrever…"
-          />
-        </div>
+      <input
+        className="fc-editor-titulo"
+        placeholder="Título"
+        value={titulo}
+        onChange={(e) => setTitulo(e.target.value)}
+        aria-label="Título do artigo"
+      />
 
-        <aside className="wr-editor-panel">
-          <h2 className="wr-section-title">Informações do texto</h2>
+      <div className="fc-editor-caixa">
+        <ReactQuill
+          theme="snow"
+          value={texto}
+          onChange={setTexto}
+          modules={MODULES}
+          formats={FORMATS}
+          placeholder="Comece a escrever…"
+        />
+      </div>
 
-          <label className="wr-field">
+      <div className="fc-editor-rodape">
+        <div className="fc-editor-campos">
+          <label className="fc-campo">
             <span>Categoria</span>
             <select value={categoria} onChange={(e) => setCategoria(e.target.value)}>
               <option value="">Sem categoria</option>
@@ -130,8 +153,8 @@ export default function Editor() {
             </select>
           </label>
 
-          <label className="wr-field">
-            <span>Tags (opcional)</span>
+          <label className="fc-campo">
+            <span>Tags</span>
             <input
               value={tagDigitada}
               onChange={(e) => setTagDigitada(e.target.value)}
@@ -139,34 +162,45 @@ export default function Editor() {
               placeholder="Digite e aperte Enter"
             />
           </label>
+
           {tags.length > 0 && (
-            <ul className="wr-tags wr-tags--edit">
+            <ul className="fc-tags">
               {tags.map((t) => (
                 <li key={t}>
                   {t}
-                  <button type="button" aria-label={`Remover tag ${t}`} onClick={() => setTags(tags.filter((x) => x !== t))}>
+                  <button
+                    type="button"
+                    aria-label={`Remover tag ${t}`}
+                    onClick={() => setTags(tags.filter((x) => x !== t))}
+                  >
                     <CloseIcon />
                   </button>
                 </li>
               ))}
             </ul>
           )}
+        </div>
 
+        <div className="fc-editor-acoes">
           {status && (
-            <p className={`wr-status wr-status--${status.tipo}`} role="status">
+            <p className={"fc-status fc-status--" + status.tipo} role="status">
               {status.texto}
             </p>
           )}
-
-          <div className="wr-editor-actions">
-            <button type="button" className="wr-btn wr-btn--ghost" onClick={guardarRascunho}>
+          <div>
+            <button type="button" className="fc-btn fc-btn--contorno" onClick={guardarRascunho}>
               Salvar rascunho
             </button>
-            <button type="button" className="wr-btn wr-btn--primary" onClick={publicar} disabled={publicando}>
+            <button
+              type="button"
+              className="fc-btn fc-btn--escuro"
+              onClick={publicar}
+              disabled={publicando}
+            >
               {publicando ? "Publicando…" : "Publicar"}
             </button>
           </div>
-        </aside>
+        </div>
       </div>
     </main>
   );

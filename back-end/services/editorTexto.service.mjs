@@ -29,4 +29,35 @@ export async function consultarDocumentos() {
   return result.rows;
 }
 
+// ATUALIZAR DOCUMENTO
+export async function atualizarDocumento(id, data) {
+  const result = await db.query(
+    `
+      UPDATE documentos
+      SET
+        titulo = $1,
+        "conteudoHtml" = $2
+      WHERE id = $3
+      RETURNING id, titulo, "conteudoHtml", "dataCriacao"
+    `,
+    [data.titulo, data.conteudoHtml, id],
+  );
+
+  return result.rows[0];
+}
+
+// DELETAR DOCUMENTO
+export async function deletarDocumento(id) {
+  const result = await db.query(
+    `
+      DELETE FROM documentos
+      WHERE id = $1
+      RETURNING id
+    `,
+    [id],
+  );
+
+  return result.rows[0];
+}
+
 export const cadastrarDocumento = publicarDocumento;

@@ -1,113 +1,61 @@
-import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useArtigos } from "../../hooks/useArtigos";
-import { categoriaDe } from "../../lib/categorias";
-import { tempoLeitura } from "../../lib/format";
-import CategoriaTag from "../CategoriaTag";
-import Meta from "../home/Meta";
-import { ArrowLeftIcon, ArrowRightIcon, LinkIcon } from "../icons";
+import { dataPorExtenso, tempoRelativo } from "../../lib/format";
+import { ArrowLeftIcon } from "../icons";
 import { Head } from "../layout/Head";
 
 export default function Article() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { artigos, carregando, erro } = useArtigos();
-  const [copiado, setCopiado] = useState(false);
 
-  // Não há GET por id na API, então buscamos na lista
-  const indice = artigos.findIndex((a) => String(a.id) === id);
-  const artigo = artigos[indice];
-  const proximo = indice >= 0 ? artigos[indice + 1] : undefined;
-
-  async function copiarLink() {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 2000);
-    } catch {
-      /* navegador sem permissão */
-    }
-  }
+  // A API não tem GET por id, então o artigo é buscado na lista
+  const artigo = artigos.find((a) => String(a.id) === id);
 
   function voltar() {
     if (window.history.length > 1) navigate(-1);
     else navigate("/");
   }
 
-  if (carregando) return <main className="wr-main"><p className="wr-state">Carregando texto…</p></main>;
-  if (erro) return <main className="wr-main"><p className="wr-state wr-state--erro">{erro}</p></main>;
-
-  if (!artigo) {
+  if (carregando) {
     return (
-      <main className="wr-main">
-        <div className="wr-empty">
-          <p>Esse texto não existe ou foi removido.</p>
-          <Link to="/" className="wr-btn wr-btn--ghost">Voltar para o início</Link>
-        </div>
+      <main className="fc-main fc-main--simples">
+        <p className="fc-estado">Carregando artigo…</p>
       </main>
     );
   }
 
-  const categoria = categoriaDe(artigo);
+  if (erro || !artigo) {
+    return (
+      <main className="fc-main fc-main--simples">
+        <p className="fc-estado fc-estado--erro">
+          {erro || "Esse artigo não existe ou foi removido."}
+        </p>
+        <Link to="/" className="fc-btn fc-btn--contorno">
+          Voltar para o início
+        </Link>
+      </main>
+    );
+  }
 
   return (
-    <main className={"wr-main" + (artigo.capaUrl ? "" : " wr-main--read")}>
-      <Head title={artigo.titulo} description={`${artigo.titulo} no Write.`} />
+    <main className="fc-main fc-main--simples fc-artigo-pagina">
+      <Head title={artigo.titulo} description={`${artigo.titulo} no Fabas Coder Blog.`} />
 
-      <button type="button" className="wr-back" onClick={voltar}>
+      <button type="button" className="fc-voltar" onClick={voltar} aria-label="Voltar">
         <ArrowLeftIcon />
-        Voltar para a lista
       </button>
 
-      <article className={"wr-article" + (artigo.capaUrl ? " has-cover" : "")}>
-        <div className="wr-article-body">
-          <header className="wr-article-head">
-            <CategoriaTag categoria={categoria} />
-            <h1 className="wr-article-title">{artigo.titulo}</h1>
-            <div className="wr-article-meta">
-              <Meta artigo={artigo} />
-              {artigo.conteudoHtml && (
-                <span className="wr-meta">{tempoLeitura(artigo.conteudoHtml)} min de leitura</span>
-              )}
-            </div>
-          </header>
+      <article className="fc-artigo">
+        <h1>{artigo.titulo}</h1>
+        <p className="fc-meta">
+          <span>{tempoRelativo(artigo.dataCriacao)}</span>
+          <span aria-hidden="true">|</span>
+          <time>{dataPorExtenso(artigo.dataCriacao)}</time>
+        </p>
 
-          <div
-            className="wr-prose"
-            dangerouslySetInnerHTML={{ __html: artigo.conteudoHtml ?? "" }}
-          />
-
-          <footer className="wr-article-foot">
-            <button type="button" className="wr-btn wr-btn--ghost wr-btn--sm" onClick={copiarLink}>
-              <LinkIcon />
-              {copiado ? "Link copiado" : "Copiar link"}
-            </button>
-            {artigo.tags && artigo.tags.length > 0 && (
-              <ul className="wr-tags" aria-label="Tags">
-                {artigo.tags.map((t) => (
-                  <li key={t}>{t}</li>
-                ))}
-              </ul>
-            )}
-          </footer>
-        </div>
-
-        {artigo.capaUrl && (
-          <figure className="wr-article-cover">
-            <img src={artigo.capaUrl} alt="" />
-          </figure>
-        )}
+        <div className="fc-prosa" dangerouslySetInnerHTML={{ __html: artigo.conteudoHtml ?? "" }} />
       </article>
-
-      {proximo && (
-        <Link to={`/artigo/${proximo.id}`} className="wr-next">
-          <span className="wr-meta">Próximo texto</span>
-          <span className="wr-next-title">
-            {proximo.titulo}
-            <ArrowRightIcon />
-          </span>
-        </Link>
-      )}
     </main>
   );
 }
