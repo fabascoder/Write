@@ -1,13 +1,13 @@
 // Ícones em linha, sem dependências. currentColor deixa o CSS decidir a cor.
 import type { ReactNode } from "react";
 
-function Icon({ children }: { children: ReactNode }) {
+function Icon({ children, fill = false }: { children: ReactNode; fill?: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
+      fill={fill ? "currentColor" : "none"}
+      stroke={fill ? "none" : "currentColor"}
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -16,44 +16,6 @@ function Icon({ children }: { children: ReactNode }) {
     </svg>
   );
 }
-
-export const MoonIcon = () => (
-  <Icon>
-    <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" />
-  </Icon>
-);
-
-export const SunIcon = () => (
-  <Icon>
-    <circle cx="12" cy="12" r="4" />
-    <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-  </Icon>
-);
-
-export const HomeIcon = () => (
-  <Icon>
-    <path d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4Z" />
-  </Icon>
-);
-
-export const MenuIcon = () => (
-  <Icon>
-    <path d="M4 7h16M4 12h16M4 17h10" />
-  </Icon>
-);
-
-export const CloseIcon = () => (
-  <Icon>
-    <path d="M6 6l12 12M18 6 6 18" />
-  </Icon>
-);
-
-export const PenIcon = () => (
-  <Icon>
-    <path d="M4 20h4L19 9l-4-4L4 16Z" />
-    <path d="m13.5 6.5 4 4" />
-  </Icon>
-);
 
 export const ArrowRightIcon = () => (
   <Icon>
@@ -67,65 +29,68 @@ export const ArrowLeftIcon = () => (
   </Icon>
 );
 
-export const LayoutIcon = () => (
+export const ChevronDownIcon = () => (
   <Icon>
-    <rect x="4" y="4" width="10" height="16" rx="1.5" />
-    <path d="M17 4h3M17 9h3M17 14h3M17 19h3" />
+    <path d="m6 9 6 6 6-6" />
   </Icon>
 );
 
-export const TimelineIcon = () => (
+export const SearchIcon = () => (
   <Icon>
-    <path d="M6 3v18" />
-    <circle cx="6" cy="7" r="1.8" />
-    <circle cx="6" cy="17" r="1.8" />
-    <path d="M11 7h9M11 17h9" />
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
   </Icon>
 );
 
-export const FileIcon = () => (
+export const PenIcon = () => (
   <Icon>
-    <path d="M7 3h7l5 5v13H7Z" />
-    <path d="M14 3v5h5M10 13h6M10 17h6" />
+    <path d="M4 20h4L19 9l-4-4L4 16Z" />
+    <path d="m13.5 6.5 4 4" />
   </Icon>
 );
 
-export const DraftIcon = () => (
+export const BookIcon = () => (
   <Icon>
-    <path d="M6 3h9l3 3v15H6Z" />
-    <path d="M9 10h6M9 14h4" />
+    <path d="M12 6.5C10.5 5 8.5 4.5 4 4.8v12.4c4.5-.3 6.5.2 8 1.8 1.5-1.6 3.5-2.1 8-1.8V4.8c-4.5-.3-6.5.2-8 1.7Z" />
+    <path d="M12 6.5v12.5" />
   </Icon>
 );
 
 export const TrashIcon = () => (
   <Icon>
-    <path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13" />
+    <path d="M5 7h14M10 7V4.5h4V7M7.5 7l.9 12.5h7.2L16.5 7" />
   </Icon>
 );
 
-export const UserIcon = () => (
+export const CloseIcon = () => (
   <Icon>
-    <circle cx="12" cy="8" r="4" />
-    <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
+    <path d="M6 6l12 12M18 6 6 18" />
   </Icon>
 );
 
-export const SettingsIcon = () => (
+export const MenuIcon = () => (
   <Icon>
-    <circle cx="12" cy="12" r="3" />
-    <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" />
+    <path d="M4 7h16M4 12h16M4 17h10" />
   </Icon>
 );
 
-export const LinkIcon = () => (
+export const LockIcon = () => (
   <Icon>
-    <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
-    <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+    <rect x="5" y="10" width="14" height="10" rx="2" />
+    <path d="M8 10V7.5a4 4 0 0 1 8 0V10" />
   </Icon>
 );
 
-export const PlusIcon = () => (
+export const InstagramIcon = () => (
   <Icon>
-    <path d="M12 5v14M5 12h14" />
+    <rect x="3" y="3" width="18" height="18" rx="5" />
+    <circle cx="12" cy="12" r="4" />
+    <circle cx="17" cy="7" r="1.2" fill="currentColor" stroke="none" />
+  </Icon>
+);
+
+export const GithubIcon = () => (
+  <Icon fill>
+    <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48l-.01-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85l-.01 2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2Z" />
   </Icon>
 );

@@ -3,8 +3,7 @@ import Layout from "./components/layout/Layout";
 import Home from "./components/pages/Home";
 import Article from "./components/pages/Article";
 import Editor from "./components/pages/Editor";
-import MeusArtigos from "./components/pages/MeusArtigos";
-import Perfil from "./components/pages/Perfil";
+import Rascunhos from "./components/pages/Rascunhos";
 
 export default function App() {
   return (
@@ -14,12 +13,12 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/artigo/:id" element={<Article />} />
           <Route path="/editor" element={<Editor />} />
-          <Route path="/meus-artigos" element={<MeusArtigos />} />
-          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/rascunhos" element={<Rascunhos />} />
 
-          {/* Rotas antigas continuam funcionando */}
+          {/* rotas antigas continuam funcionando */}
           <Route path="/article/:id" element={<Article />} />
-          <Route path="/calendarPage" element={<Navigate to="/?visao=linha-do-tempo" replace />} />
+          <Route path="/meus-artigos" element={<Navigate to="/" replace />} />
+          <Route path="/perfil" element={<Navigate to="/" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

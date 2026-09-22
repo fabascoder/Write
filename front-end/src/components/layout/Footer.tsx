@@ -1,20 +1,30 @@
-import { Link } from "react-router-dom";
-import { CATEGORIAS } from "../../lib/categorias";
+import Brand from "./Brand";
+import { ArrowRightIcon } from "../icons";
 
-export default function Footer() {
+type Props = {
+  logado: boolean;
+  abrirLogin: () => void;
+  sair: () => void;
+};
+
+export default function Footer({ logado, abrirLogin, sair }: Props) {
   return (
-    <footer className="wr-footer">
-      <span className="wr-brand wr-brand--sm">
-        Write<span>.</span>
-      </span>
-      <nav aria-label="Rodapé">
-        <Link to="/">Início</Link>
-        {CATEGORIAS.map((c) => (
-          <Link key={c.slug} to={`/?categoria=${c.slug}`}>
-            {c.nome}
-          </Link>
-        ))}
-      </nav>
+    <footer className="fc-footer">
+      <div className="fc-footer-linha">
+        <Brand />
+        {logado ? (
+          <button type="button" className="fc-access" onClick={sair}>
+            Sair
+            <ArrowRightIcon />
+          </button>
+        ) : (
+          <button type="button" className="fc-access" onClick={abrirLogin}>
+            Access
+            <ArrowRightIcon />
+          </button>
+        )}
+      </div>
+      <p className="fc-copy">todos os direitos reservados</p>
     </footer>
   );
 }

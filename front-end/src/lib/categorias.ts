@@ -5,12 +5,12 @@ export type Categoria = {
   nome: string;
 };
 
-// Cores ficam no CSS (--cat-vida, --cat-poemas...) para funcionarem no tema escuro
 export const CATEGORIAS: Categoria[] = [
-  { slug: "vida", nome: "Vida" },
-  { slug: "poemas", nome: "Poemas" },
-  { slug: "trabalho", nome: "Trabalho" },
+  { slug: "pensamentos", nome: "Pensamentos" },
+  { slug: "poesias", nome: "Poesias" },
+  { slug: "reflexoes", nome: "Reflexões" },
   { slug: "romance", nome: "Romance" },
+  { slug: "trabalho", nome: "Trabalho" },
 ];
 
 function normalizar(texto: string) {
@@ -21,7 +21,7 @@ function normalizar(texto: string) {
     .trim();
 }
 
-// Usa o campo categoria; se a API ainda não tiver, tenta achar nas tags
+// Usa o campo categoria; se a API ainda não devolver, tenta achar nas tags
 export function categoriaDe(artigo: Artigo): Categoria | undefined {
   const candidatos = [artigo.categoria, ...(artigo.tags ?? [])].filter(
     Boolean,
