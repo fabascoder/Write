@@ -1,28 +1,77 @@
 import "dotenv/config";
 import pg from "pg";
+import { DatabaseSync } from "node:sqlite";
 
 const { Pool } = pg;
+const usePostgres = Boolean(process.env.DATABASE_URL);
+const sqliteDb = usePostgres ? null : new DatabaseSync("./banco.db");
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL não foi configurada");
-}
+export const db = usePostgres
+  ? new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl:
+        process.env.DATABASE_SSL === "true"
+          ? { rejectUnauthorized: false }
+          : false,
+    })
+  : {
+      async query(sql, params = []) {
+        const sqlText = String(sql).trim();
+        const statement = sqliteDb.prepare(sqlText);
 
-export const db = new Pool({
-  connectionString: process.env.DATABASE_URL,
+        if (sqlText.toUpperCase().startsWith("INSERT")) {
+          const result = statement.run(...params);
 
-  ssl:
-    process.env.DATABASE_SSL === "true" ? { rejectUnauthorized: false } : false,
-});
+          if (sqlText.toUpperCase().includes("RETURNING")) {
+            const rows = sqliteDb
+              .prepare(
+                `SELECT id, titulo, conteudoHtml, dataCriacao FROM documentos WHERE id = ?`,
+              )
+              .all(Number(result.lastInsertRowid));
+
+            return { rows };
+          }
+
+          return {
+            rows: [{ id: Number(result.lastInsertRowid) }],
+          };
+        }
+
+        return {
+          rows: statement.all(...params),
+        };
+      },
+      prepare(sql) {
+        return sqliteDb.prepare(sql);
+      },
+      exec(sql) {
+        sqliteDb.exec(sql);
+      },
+    };
 
 export async function inicializarBanco() {
-  await db.query(/*sql*/ `
+  if (usePostgres) {
+    await db.query(/*sql*/ `
+      CREATE TABLE IF NOT EXISTS documentos (
+        id SERIAL PRIMARY KEY,
+        titulo TEXT NOT NULL,
+        "conteudoHtml" TEXT NOT NULL,
+        "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    console.log("Tabela documentos verificada com sucesso.");
+    return;
+  }
+
+  sqliteDb.exec(/*sql*/ `
     CREATE TABLE IF NOT EXISTS documentos (
-      id SERIAL PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       titulo TEXT NOT NULL,
-      "conteudoHtml" TEXT NOT NULL,
-      "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+      conteudoHtml TEXT NOT NULL,
+      dataCriacao TEXT NOT NULL DEFAULT (datetime('now'))
     );
   `);
 
-  console.log("Tabela documentos verificada com sucesso.");
+  console.log("Banco local SQLite inicializado com sucesso.");
 }
