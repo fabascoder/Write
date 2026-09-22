@@ -1,32 +1,62 @@
 /* =====================================================================
-   Write. — design tokens & base styles
-   Palette: ink on paper. A writing journal told as a timeline.
+   Write. — tokens e base
+   Papel claro, tinta quente, uma cor de ação oliva.
    ===================================================================== */
 
 :root {
-  /* paper & ink */
-  --paper: #ffffff;            /* the sheet / reading surface     */
-  --desk: #f4f2ee;             /* warm off-white behind the sheet */
-  --ink: #15120e;              /* primary headings (Write., months) */
-  --ink-soft: #8c847a;         /* post titles — read, warm gray   */
-  --ink-faint: #aaa298;        /* metadata — quietest voice       */
-  --line: #d9d3c8;             /* timeline rule + node rings       */
-  --hair: #ece8e1;             /* hairline borders                 */
-  --wash: #f3f0ea;             /* hover wash on controls           */
+  --bg: #efece5;          /* mesa, atrás da folha */
+  --paper: #f8f6f1;       /* folha principal */
+  --card: #fcfbf8;        /* cartões dentro da folha */
+  --ink: #1f1d1a;         /* títulos */
+  --ink-2: #57524b;       /* texto corrido */
+  --ink-3: #8f887e;       /* meta, apoio */
+  --line: #e3dfd6;        /* bordas finas */
+  --line-2: #d4cec3;      /* trilho da timeline */
+  --wash: #efebe3;        /* hover e selecionado */
+  --accent: #5b6142;      /* botão principal (oliva) */
+  --accent-hover: #4b5036;
+  --on-accent: #fbfaf6;
+  --danger: #a34a3c;
 
-  /* type roles */
-  --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+  --cat-vida: #7f9068;
+  --cat-poemas: #9a8f3e;
+  --cat-trabalho: #5b6394;
+  --cat-romance: #9a5f8e;
+
+  --brand: "Playfair Display", Georgia, serif;
+  --serif: "Lora", Georgia, "Times New Roman", serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", "Courier New", monospace;
+  --mono: "JetBrains Mono", ui-monospace, "Courier New", monospace;
 
-  /* layout */
-  --sheet-max: 880px;
-  --gutter: 42px;              /* left lane reserved for the timeline */
-  --gutter-x: 13px;            /* x of the rail / node centers        */
-  --node: 11px;                /* node ring diameter                  */
-  --node-y: 22px;              /* node center, aligned to title line  */
-
+  --sheet-max: 1240px;
+  --radius: 10px;
+  --radius-lg: 16px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #121110;
+  --paper: #1a1917;
+  --card: #201f1c;
+  --ink: #ece8df;
+  --ink-2: #bdb7ac;
+  --ink-3: #8a847a;
+  --line: #2e2c28;
+  --line-2: #3d3a35;
+  --wash: #27251f;
+  --accent: #a4ab82;
+  --accent-hover: #b6bc95;
+  --on-accent: #16150f;
+  --danger: #e08a7a;
+
+  --cat-vida: #a2b38a;
+  --cat-poemas: #c9bd68;
+  --cat-trabalho: #9aa2d6;
+  --cat-romance: #cf96c2;
+
+  color-scheme: dark;
 }
 
 *,
@@ -41,12 +71,14 @@ html {
 
 body {
   margin: 0;
-  background: var(--desk);
+  background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease);
 }
 
 a {
@@ -54,27 +86,46 @@ a {
   text-decoration: none;
 }
 
-button {
-  font-family: inherit;
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
 }
 
-/* ---- motion ---------------------------------------------------------- */
+h1, h2, h3, p, ul, ol, figure {
+  margin: 0;
+}
+
+ul, ol {
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+svg {
+  display: block;
+}
+
 @keyframes wr-fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation: none !important;
     transition: none !important;
+    scroll-behavior: auto !important;
   }
 }

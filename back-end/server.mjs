@@ -4,19 +4,19 @@ import editorTextoRoutes from "./routes/editorTexto.route.mjs";
 
 const router = new Router();
 
-editorTextoRoutes(router);
-
 router.get("/", (req, res) => {
-  res.end("Home");
+  res.writeHead(200, {
+    "Content-Type": "application/json",
+  });
+
+  res.end(
+    JSON.stringify({
+      mensagem: "API Write funcionando!",
+    }),
+  );
 });
 
-router.get("/produtos/notebook", (req, res) => {
-  res.end("Produtos - notebook");
-});
-
-router.post("/produtos", (req, res) => {
-  res.end("Notebook post");
-});
+editorTextoRoutes(router);
 
 const server = createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -54,6 +54,8 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(3000, () => {
-  console.log("Server: http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor executando na porta ${PORT}`);
 });
