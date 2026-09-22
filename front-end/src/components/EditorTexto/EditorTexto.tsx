@@ -7,8 +7,45 @@ import "./EditorTexto.css";
 export default function EditorTexto() {
   const [texto, setTexto] = useState("");
 
-  const salvarTexto = () => {
-    console.log("Conteúdo do livro:", texto);
+  const [titulo, setTitulo] = useState("Meu editor de texto");
+
+  const [editandoTitulo, setEditandoTitulo] = useState(false);
+
+  const [salvando, setSalvando] = useState(false);
+
+  const salvarTexto = async () => {
+    try {
+      setSalvando(true);
+
+      const response = await fetch("http://localhost:3000/publicar", {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          titulo: titulo,
+          conteudoHtml: texto,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.mensagem || "Erro ao salvar documento");
+      }
+
+      console.log("Documento salvo:", data);
+
+      alert("Documento salvo com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+
+      alert("Não foi possível salvar o documento.");
+    } finally {
+      setSalvando(false);
+    }
   };
 
   const modules = {
@@ -41,7 +78,22 @@ export default function EditorTexto() {
 
   return (
     <div className="editor-container">
-      <h1>Meu editor de texto</h1>
+      {editandoTitulo ? (
+        <input
+          type="text"
+          value={titulo}
+          onChange={(e) => setTitulo(e.target.value)}
+          onBlur={() => setEditandoTitulo(false)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setEditandoTitulo(false);
+            }
+          }}
+          autoFocus
+        />
+      ) : (
+        <h1 onDoubleClick={() => setEditandoTitulo(true)}>{titulo}</h1>
+      )}
 
       <ReactQuill
         theme="snow"
@@ -55,9 +107,12 @@ export default function EditorTexto() {
       <div className="editor-preview">
         <h2>Conteúdo do editor:</h2>
 
-        <p>{texto}</p>
+        <div dangerouslySetInnerHTML={{ __html: texto }} />
       </div>
-      <button onClick={salvarTexto}>Salvar texto</button>
+
+      <button onClick={salvarTexto} disabled={salvando}>
+        {salvando ? "Salvando..." : "Salvar texto"}
+      </button>
     </div>
   );
 }
