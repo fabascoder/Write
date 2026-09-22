@@ -1,0 +1,44 @@
+.editor-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.editor-container h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+/* Área onde o usuário escreve */
+.editor-container .ql-container {
+  min-height: 500px;
+  font-size: 18px;
+  font-family: Georgia, serif;
+}
+
+/* Espaço de escrita */
+.editor-container .ql-editor {
+  min-height: 500px;
+  line-height: 1.8;
+}
+
+/* Barra de ferramentas */
+.editor-container .ql-toolbar {
+  border-radius: 8px 8px 0 0;
+}
+
+/* Editor */
+.editor-container .ql-container {
+  border-radius: 0 0 8px 8px;
+}
+
+/* Prévia do conteúdo */
+.editor-preview {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}

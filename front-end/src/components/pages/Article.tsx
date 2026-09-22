@@ -1,76 +1,113 @@
-import { useEffect, useRef } from "react";
-import "../../styles/Article.css";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useArtigos } from "../../hooks/useArtigos";
+import { categoriaDe } from "../../lib/categorias";
+import { tempoLeitura } from "../../lib/format";
+import CategoriaTag from "../CategoriaTag";
+import Meta from "../home/Meta";
+import { ArrowLeftIcon, ArrowRightIcon, LinkIcon } from "../icons";
 import { Head } from "../layout/Head";
 
 export default function Article() {
-  const articleRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("show");
-        }
-      },
-      {
-        threshold: 0.2,
-      },
-    );
-
-    if (articleRef.current) {
-      observer.observe(articleRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
+  const { id } = useParams();
   const navigate = useNavigate();
-  function handleClick() {
-    navigate(-1);
+  const { artigos, carregando, erro } = useArtigos();
+  const [copiado, setCopiado] = useState(false);
+
+  // Não há GET por id na API, então buscamos na lista
+  const indice = artigos.findIndex((a) => String(a.id) === id);
+  const artigo = artigos[indice];
+  const proximo = indice >= 0 ? artigos[indice + 1] : undefined;
+
+  async function copiarLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch {
+      /* navegador sem permissão */
+    }
   }
 
-  return (
-    <main className="article-container fade-up">
-      <Head title="Artigo" description="Esse é o artigo"/>
-      <div className="article-topo">
-        <button onClick={handleClick} className="article-voltar">
-          ←
-        </button>
+  function voltar() {
+    if (window.history.length > 1) navigate(-1);
+    else navigate("/");
+  }
 
-        <div className="article-idioma">
-          <span>PT</span>
-          <span>|</span>
-          <span>EN</span>
+  if (carregando) return <main className="wr-main"><p className="wr-state">Carregando texto…</p></main>;
+  if (erro) return <main className="wr-main"><p className="wr-state wr-state--erro">{erro}</p></main>;
+
+  if (!artigo) {
+    return (
+      <main className="wr-main">
+        <div className="wr-empty">
+          <p>Esse texto não existe ou foi removido.</p>
+          <Link to="/" className="wr-btn wr-btn--ghost">Voltar para o início</Link>
         </div>
-      </div>
+      </main>
+    );
+  }
 
-      <h1 className="article-title">Ceguidão.</h1>
+  const categoria = categoriaDe(artigo);
 
-      <p className="article-description">
-        Em um mundo cada vez mais conectado, a forma como compartilhamos ideias
-        e experiências evolui constantemente. Este espaço foi criado para reunir
-        pensamentos, reflexões e conteúdos diversos em um ambiente simples e
-        agradável. A proposta é oferecer uma leitura leve, permitindo que cada
-        publicação tenha seu próprio significado e contexto.
-      </p>
+  return (
+    <main className={"wr-main" + (artigo.capaUrl ? "" : " wr-main--read")}>
+      <Head title={artigo.titulo} description={`${artigo.titulo} no Write.`} />
 
-      <section ref={articleRef} className="article-card">
-        <h2>Efeitos</h2>
+      <button type="button" className="wr-back" onClick={voltar}>
+        <ArrowLeftIcon />
+        Voltar para a lista
+      </button>
 
-        <p className="article-main-text">
-          A maior prova de amor já existente é o sacrifício de Jesus por seus
-          filhos. Com esse amor fomos perdoados e justificados diante de Deus.
-        </p>
+      <article className={"wr-article" + (artigo.capaUrl ? " has-cover" : "")}>
+        <div className="wr-article-body">
+          <header className="wr-article-head">
+            <CategoriaTag categoria={categoria} />
+            <h1 className="wr-article-title">{artigo.titulo}</h1>
+            <div className="wr-article-meta">
+              <Meta artigo={artigo} />
+              {artigo.conteudoHtml && (
+                <span className="wr-meta">{tempoLeitura(artigo.conteudoHtml)} min de leitura</span>
+              )}
+            </div>
+          </header>
 
-        <hr />
+          <div
+            className="wr-prose"
+            dangerouslySetInnerHTML={{ __html: artigo.conteudoHtml ?? "" }}
+          />
 
-        <p className="article-secondary-text">
-          Esse é um texto de teste, estou utilizando React. A maioria das
-          pessoas são más, porque Cristo veio e nos salvou. A partir disso temos
-          o prazer de estar na presença de Deus e somos perdoados pelos nossos
-          pecados.
-        </p>
-      </section>
+          <footer className="wr-article-foot">
+            <button type="button" className="wr-btn wr-btn--ghost wr-btn--sm" onClick={copiarLink}>
+              <LinkIcon />
+              {copiado ? "Link copiado" : "Copiar link"}
+            </button>
+            {artigo.tags && artigo.tags.length > 0 && (
+              <ul className="wr-tags" aria-label="Tags">
+                {artigo.tags.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            )}
+          </footer>
+        </div>
+
+        {artigo.capaUrl && (
+          <figure className="wr-article-cover">
+            <img src={artigo.capaUrl} alt="" />
+          </figure>
+        )}
+      </article>
+
+      {proximo && (
+        <Link to={`/artigo/${proximo.id}`} className="wr-next">
+          <span className="wr-meta">Próximo texto</span>
+          <span className="wr-next-title">
+            {proximo.titulo}
+            <ArrowRightIcon />
+          </span>
+        </Link>
+      )}
     </main>
   );
 }

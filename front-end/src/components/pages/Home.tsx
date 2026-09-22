@@ -1,71 +1,81 @@
-import Header from "../layout/Header";
-import "../../styles/App.css";
-import "../../styles/HomePage.css";
-import { Footer } from "../layout/Footer";
-import { NavLink } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { useArtigos } from "../../hooks/useArtigos";
+import { buscarCategoria, categoriaDe } from "../../lib/categorias";
+import FeaturedView from "../home/FeaturedView";
+import TimelineView from "../home/TimelineView";
+import ViewToggle, { type Visao } from "../home/ViewToggle";
 import { Head } from "../layout/Head";
 
-// Conteúdo apenas para renderização (sem lógica de comportamento).
-const posts = [
-  { id: 1, time: "Há 2 horas atrás", date: "14 jun 26", title: "Visão React.", tags: ["Poemas", "Vida"] },
-  { id: 2, time: "Há 2 horas atrás", date: "14 jun 26", title: "Visão React.", tags: ["Poemas", "Vida"] },
-];
-
 export default function Home() {
+  const { artigos, carregando, erro } = useArtigos();
+  const [params, setParams] = useSearchParams();
+
+  const visao: Visao = params.get("visao") === "linha-do-tempo" ? "linha-do-tempo" : "destaques";
+  const categoria = buscarCategoria(params.get("categoria"));
+
+  const filtrados = categoria
+    ? artigos.filter((a) => categoriaDe(a)?.slug === categoria.slug)
+    : artigos;
+
+  function atualizar(chave: string, valor: string | null) {
+    const novos = new URLSearchParams(params);
+    if (valor) novos.set(chave, valor);
+    else novos.delete(chave);
+    setParams(novos, { replace: true });
+  }
+
+  const mudarVisao = (v: Visao) => atualizar("visao", v === "destaques" ? null : v);
+  const escolherCategoria = (slug: string | null) => atualizar("categoria", slug);
+
   return (
+    <main className="wr-main">
+      <Head title={categoria?.nome ?? "Início"} description="Textos publicados no Write." />
 
-    <div className="wr-page" id="top">
-      <Head title="Home" description="Essa é a página inicial da Write"/>
-      <div className="wr-sheet">
-        <Header />
-
-        <div className="wr-feed">
-          {/* Navegação */}
-          <nav className="wb-nav">
-            <div className="wb-nav-item">
-              <a className="wb-nav-link vida" href="#vida">Vida</a>
-            </div>
-            <div className="wb-nav-item">
-              <a className="wb-nav-link poemas" href="#poemas">Poemas</a>
-            </div>
-            <div className="wb-nav-item">
-              <a className="wb-nav-link trabalho" href="#trabalho">Trabalho</a>
-            </div>
-            <div className="wb-nav-item">
-              <a className="wb-nav-link romance" href="#romance">Romance</a>
-              <span className="wb-nav-arrow" aria-hidden="true">↓</span>
-            </div>
-          </nav>
-
-          {/* Artigos */}
-          <main className="wb-articles">
-            {posts.map((post) => (
-              <NavLink to="/article" key={post.id}>
-                <article className="wb-card" key={post.id}>
-                <p className="wb-meta">{post.time} | {post.date}</p>
-                <h2 className="wb-card-title">
-                  <p>{post.title}</p>
-                </h2>
-                <p className="wb-tags">
-                  {post.tags.map((tag, i) => (
-                    <span key={tag}>
-                      {i > 0 && <span className="dot">•</span>}
-                      {tag}
-                    </span>
-                  ))}
-                </p>
-                <hr className="wb-divider" />
-              </article>
-              </NavLink>
-              
-            ))}
-          </main>
-
-          {/* Rodapé */}
-          <Footer />
+      <div className="wr-toolbar">
+        <div>
+          <h1 className="wr-page-title">{categoria?.nome ?? "Todos os textos"}</h1>
+          {!carregando && !erro && (
+            <p className="wr-page-sub">
+              {filtrados.length === 1 ? "1 texto publicado" : `${filtrados.length} textos publicados`}
+            </p>
+          )}
         </div>
+        <ViewToggle visao={visao} mudar={mudarVisao} />
       </div>
-    </div>
+
+      {carregando && <p className="wr-state">Carregando artigos…</p>}
+      {erro && <p className="wr-state wr-state--erro">{erro}</p>}
+
+      {!carregando && !erro && filtrados.length === 0 && (
+        <div className="wr-empty">
+          <p>
+            {categoria
+              ? `Ainda não há textos em ${categoria.nome}.`
+              : "Nenhum texto publicado ainda."}
+          </p>
+          <Link to="/editor" className="wr-btn wr-btn--primary">
+            Escrever o primeiro
+          </Link>
+        </div>
+      )}
+
+      {!carregando && !erro && filtrados.length > 0 && (
+        visao === "destaques" ? (
+          <FeaturedView
+            artigos={filtrados}
+            todos={artigos}
+            categoria={categoria?.slug ?? null}
+            escolherCategoria={escolherCategoria}
+          />
+        ) : (
+          <TimelineView
+            artigos={filtrados}
+            todos={artigos}
+            categoria={categoria?.slug ?? null}
+            escolherCategoria={escolherCategoria}
+          />
+        )
+      )}
+    </main>
   );
 }
-
