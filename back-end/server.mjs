@@ -6,18 +6,6 @@ const router = new Router();
 
 editorTextoRoutes(router);
 
-router.get("/", (req, res) => {
-  res.end("Home");
-});
-
-router.get("/produtos/notebook", (req, res) => {
-  res.end("Produtos - notebook");
-});
-
-router.post("/produtos", (req, res) => {
-  res.end("Notebook post");
-});
-
 const server = createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(

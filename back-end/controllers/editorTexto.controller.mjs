@@ -42,3 +42,33 @@ export async function publicarDocumento(req, res) {
     );
   }
 }
+
+// Consultar todos os documentos
+export async function consultarDocumentos(req, res) {
+  try {
+    const documentos = servicesEditorTexto.consultarDocumentos();
+
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+    });
+
+    return res.end(
+      JSON.stringify({
+        mensagem: "Documentos consultados com sucesso",
+        documentos,
+      }),
+    );
+  } catch (error) {
+    console.error(error);
+
+    res.writeHead(500, {
+      "Content-Type": "application/json",
+    });
+
+    return res.end(
+      JSON.stringify({
+        mensagem: "Erro ao consultar documentos",
+      }),
+    );
+  }
+}
