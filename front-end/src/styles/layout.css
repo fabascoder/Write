@@ -470,3 +470,23 @@
   }
   .fc-access { font-size: 18px; }
 }
+
+/* ---------- Confirmação de exclusão ---------- */
+.fc-modal-icone--alerta {
+  background: #fdecea;
+  color: var(--erro);
+}
+.fc-modal-acoes {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+.fc-modal-acoes .fc-btn { flex: 1; height: 44px; }
+
+.fc-btn--perigo {
+  background: var(--erro);
+  border-color: var(--erro);
+  color: #fff;
+}
+.fc-btn--perigo:hover { background: #a5301f; border-color: #a5301f; }
+.fc-btn--perigo:disabled { opacity: 0.65; cursor: progress; }

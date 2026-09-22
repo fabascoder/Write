@@ -56,6 +56,12 @@ export const BookIcon = () => (
   </Icon>
 );
 
+export const TrashIcon = () => (
+  <Icon>
+    <path d="M5 7h14M10 7V4.5h4V7M7.5 7l.9 12.5h7.2L16.5 7" />
+  </Icon>
+);
+
 export const CloseIcon = () => (
   <Icon>
     <path d="M6 6l12 12M18 6 6 18" />

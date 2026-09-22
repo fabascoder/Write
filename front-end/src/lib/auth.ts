@@ -15,8 +15,8 @@ const CHAVE_SESSAO = "fcb-sessao";
 
 const PADRAO: Credenciais = {
   autor: "Fabas Coder",
-  email: import.meta.env.VITE_ADMIN_EMAIL ?? "admin@fabascoder.dev",
-  senha: import.meta.env.VITE_ADMIN_SENHA ?? "admin",
+  email: import.meta.env.VITE_ADMIN_EMAIL ?? "fabricialvez2@gmail.com",
+  senha: import.meta.env.VITE_ADMIN_SENHA ?? "Fabricio@124",
 };
 
 export function lerCredenciais(): Credenciais {

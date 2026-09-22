@@ -56,3 +56,36 @@ export async function publicarArtigo(artigo: NovoArtigo) {
 
   return data;
 }
+
+// PUT /documentos/:id — edita um artigo já publicado
+export async function atualizarArtigo(id: string | number, artigo: NovoArtigo) {
+  const response = await fetch(`${API_URL}/documentos/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(artigo),
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.mensagem || "Erro ao atualizar artigo");
+  }
+
+  return data;
+}
+
+// DELETE /documentos/:id — apaga um artigo publicado
+export async function excluirArtigo(id: string | number) {
+  const response = await fetch(`${API_URL}/documentos/${id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data.mensagem || "Erro ao excluir artigo");
+  }
+
+  return data;
+}

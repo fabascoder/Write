@@ -198,3 +198,22 @@
   .fc-editor-acoes > div .fc-btn { flex: 1; }
   .fc-mais-lista > li { flex-wrap: wrap; }
 }
+
+/* ---------- Ações de admin no artigo ---------- */
+.fc-artigo-topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+.fc-artigo-topo h1 { flex: 1; min-width: 0; }
+
+.fc-artigo-acoes {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+  padding-top: 6px;
+  animation: fc-aparece 0.3s var(--suave) both;
+}
+
+.fc-editor-pagina .fc-rotulo { margin-bottom: 10px; }
