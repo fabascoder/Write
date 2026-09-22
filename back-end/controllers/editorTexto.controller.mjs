@@ -56,6 +56,7 @@ export async function consultarDocumentos(req, res) {
       JSON.stringify({
         mensagem: "Documentos consultados com sucesso",
         documentos,
+        artigos: documentos,
       }),
     );
   } catch (error) {
