@@ -4,6 +4,18 @@ import editorTextoRoutes from "./routes/editorTexto.route.mjs";
 
 const router = new Router();
 
+router.get("/", (req, res) => {
+  res.writeHead(200, {
+    "Content-Type": "application/json",
+  });
+
+  res.end(
+    JSON.stringify({
+      mensagem: "API Write funcionando!",
+    }),
+  );
+});
+
 editorTextoRoutes(router);
 
 const server = createServer(async (req, res) => {
@@ -42,6 +54,8 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(3000, () => {
-  console.log("Server: http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Servidor executando na porta ${PORT}`);
 });

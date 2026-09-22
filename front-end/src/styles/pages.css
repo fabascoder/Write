@@ -1,0 +1,399 @@
+/* ---------- Voltar ---------- */
+.wr-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.wr-back svg {
+  width: 16px;
+  height: 16px;
+}
+.wr-back:hover {
+  color: var(--ink);
+}
+
+/* =====================================================================
+   Artigo
+   ===================================================================== */
+.wr-article {
+  display: grid;
+  grid-template-columns: minmax(0, 680px);
+  gap: 56px;
+  align-items: start;
+}
+.wr-article.has-cover {
+  grid-template-columns: minmax(0, 680px) minmax(240px, 1fr);
+}
+
+.wr-article-title {
+  margin: 4px 0 14px;
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(34px, 4.5vw, 52px);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+.wr-article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding-bottom: 28px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+}
+
+.wr-prose {
+  font-family: var(--serif);
+  font-size: 19px;
+  line-height: 1.8;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+.wr-prose > * + * {
+  margin-top: 1.1em;
+}
+.wr-prose h1,
+.wr-prose h2,
+.wr-prose h3 {
+  margin-top: 1.6em;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.wr-prose h1 { font-size: 30px; }
+.wr-prose h2 { font-size: 25px; }
+.wr-prose h3 { font-size: 21px; }
+.wr-prose a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.wr-prose blockquote {
+  margin-left: 0;
+  padding-left: 20px;
+  border-left: 2px solid var(--accent);
+  font-style: italic;
+  color: var(--ink);
+}
+.wr-prose ol,
+.wr-prose ul {
+  padding-left: 1.3em;
+}
+.wr-prose ol { list-style: decimal; }
+.wr-prose ul { list-style: disc; }
+.wr-prose .ql-align-center { text-align: center; }
+.wr-prose .ql-align-right { text-align: right; }
+.wr-prose .ql-align-justify { text-align: justify; }
+
+.wr-article-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 44px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.wr-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.wr-tags li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--wash);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.wr-tags button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+.wr-tags button svg {
+  width: 12px;
+  height: 12px;
+}
+
+.wr-article-cover {
+  position: sticky;
+  top: 108px;
+}
+.wr-article-cover img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
+.wr-next {
+  display: grid;
+  gap: 6px;
+  max-width: 680px;
+  margin-top: 56px;
+  padding: 24px 28px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+.wr-next-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--serif);
+  font-size: 22px;
+}
+.wr-next-title svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  transition: transform 0.2s var(--ease);
+}
+.wr-next:hover .wr-next-title svg {
+  transform: translateX(4px);
+}
+
+/* =====================================================================
+   Editor
+   ===================================================================== */
+.wr-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 28px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+.wr-editor-paper {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.wr-editor-title {
+  width: 100%;
+  padding: 28px 32px 8px;
+  border: 0;
+  background: transparent;
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.wr-editor-title::placeholder {
+  color: var(--ink-3);
+}
+.wr-editor-title:focus {
+  outline: none;
+}
+
+/* ajustes no tema "snow" do Quill */
+.wr-editor-paper .ql-toolbar.ql-snow {
+  position: sticky;
+  top: 79px;
+  z-index: 2;
+  padding: 10px 28px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: var(--card);
+}
+.wr-editor-paper .ql-container.ql-snow {
+  border: 0;
+  font-family: var(--serif);
+  font-size: 18px;
+}
+.wr-editor-paper .ql-editor {
+  min-height: 460px;
+  padding: 28px 32px 48px;
+  line-height: 1.8;
+  color: var(--ink-2);
+}
+.wr-editor-paper .ql-editor.ql-blank::before {
+  left: 32px;
+  font-style: italic;
+  color: var(--ink-3);
+}
+.wr-editor-paper .ql-snow .ql-stroke { stroke: var(--ink-2); }
+.wr-editor-paper .ql-snow .ql-fill { fill: var(--ink-2); }
+.wr-editor-paper .ql-snow .ql-picker { color: var(--ink-2); }
+.wr-editor-paper .ql-snow .ql-picker-options {
+  background: var(--paper);
+  border-color: var(--line);
+}
+.wr-editor-paper .ql-snow button:hover .ql-stroke,
+.wr-editor-paper .ql-snow .ql-active .ql-stroke { stroke: var(--accent); }
+.wr-editor-paper .ql-snow button:hover .ql-fill,
+.wr-editor-paper .ql-snow .ql-active .ql-fill { fill: var(--accent); }
+.wr-editor-paper .ql-snow .ql-picker-label:hover,
+.wr-editor-paper .ql-snow .ql-picker-item:hover { color: var(--accent); }
+.wr-editor-paper .ql-snow .ql-tooltip {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--ink);
+  box-shadow: none;
+}
+
+.wr-editor-panel {
+  position: sticky;
+  top: 108px;
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+.wr-editor-panel .wr-section-title {
+  margin-bottom: 0;
+}
+.wr-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.wr-editor-panel .wr-editor-actions .wr-btn {
+  flex: 1;
+}
+
+/* =====================================================================
+   Meus artigos
+   ===================================================================== */
+.wr-manage {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 48px;
+  align-items: start;
+}
+.wr-manage-nav {
+  position: sticky;
+  top: 108px;
+  display: grid;
+  gap: 2px;
+}
+.wr-manage-list {
+  display: grid;
+  gap: 10px;
+}
+.wr-manage-list > li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.wr-manage-info {
+  flex: 1;
+  min-width: 0;
+}
+.wr-manage-info .wr-row-title {
+  font-size: 18px;
+}
+.wr-manage-info .wr-row-title:hover {
+  color: var(--ink-2);
+}
+.wr-manage-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+.wr-manage-meta .wr-cat {
+  margin: 0;
+}
+
+/* =====================================================================
+   Perfil
+   ===================================================================== */
+.wr-profile {
+  display: grid;
+  gap: 18px;
+  max-width: 520px;
+  margin-top: 28px;
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 1024px) {
+  .wr-article.has-cover {
+    grid-template-columns: 1fr;
+  }
+  .wr-article-cover {
+    position: static;
+    order: -1;
+  }
+  .wr-article-cover img {
+    aspect-ratio: 16 / 9;
+  }
+  .wr-editor {
+    grid-template-columns: 1fr;
+  }
+  .wr-editor-panel {
+    position: static;
+  }
+  .wr-manage {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .wr-manage-nav {
+    position: static;
+    display: flex;
+    gap: 6px;
+  }
+  .wr-manage-nav .wr-side-link {
+    width: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .wr-prose {
+    font-size: 17.5px;
+  }
+  .wr-editor-title {
+    padding: 22px 18px 6px;
+    font-size: 26px;
+  }
+  .wr-editor-paper .ql-toolbar.ql-snow {
+    top: 67px;
+    padding: 8px 12px;
+  }
+  .wr-editor-paper .ql-editor {
+    padding: 22px 18px 40px;
+  }
+  .wr-editor-paper .ql-editor.ql-blank::before {
+    left: 18px;
+  }
+  .wr-manage-list > li {
+    flex-wrap: wrap;
+    padding: 14px 16px;
+  }
+  .wr-next {
+    padding: 20px;
+  }
+}
+
+/* sem imagem de capa, a leitura fica centralizada na folha */
+.wr-main--read {
+  max-width: 776px;
+  margin-inline: auto;
+}
