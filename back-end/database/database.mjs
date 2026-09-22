@@ -1,12 +1,28 @@
-import { DatabaseSync } from "node:sqlite";
+import "dotenv/config";
+import pg from "pg";
 
-export const db = new DatabaseSync("./banco.db");
+const { Pool } = pg;
 
-db.exec(/*sql*/ `
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL não foi configurada");
+}
+
+export const db = new Pool({
+  connectionString: process.env.DATABASE_URL,
+
+  ssl:
+    process.env.DATABASE_SSL === "true" ? { rejectUnauthorized: false } : false,
+});
+
+export async function inicializarBanco() {
+  await db.query(/*sql*/ `
     CREATE TABLE IF NOT EXISTS documentos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    titulo TEXT NOT NULL,
-    conteudoHtml TEXT NOT NULL,
-    dataCriacao TEXT NOT NULL DEFAULT (datetime('now'))
-);
-    `);
+      id SERIAL PRIMARY KEY,
+      titulo TEXT NOT NULL,
+      "conteudoHtml" TEXT NOT NULL,
+      "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  console.log("Tabela documentos verificada com sucesso.");
+}

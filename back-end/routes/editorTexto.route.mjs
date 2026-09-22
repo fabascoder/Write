@@ -6,4 +6,5 @@ import {
 export default function editorTextoRoutes(router) {
   router.post("/publicar", publicarDocumento);
   router.get("/consultarArtigos", consultarDocumentos);
+  router.get("/documentos", consultarDocumentos);
 }

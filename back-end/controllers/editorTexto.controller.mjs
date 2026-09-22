@@ -9,33 +9,35 @@ export async function publicarDocumento(req, res) {
         "Content-Type": "application/json",
       });
 
-      return res.end(
+      res.end(
         JSON.stringify({
           mensagem: "Título e conteúdo são obrigatórios",
         }),
       );
+
+      return;
     }
 
-    const documento = servicesEditorTexto.publicarDocumento(data);
+    const documento = await servicesEditorTexto.publicarDocumento(data);
 
     res.writeHead(201, {
       "Content-Type": "application/json",
     });
 
-    return res.end(
+    res.end(
       JSON.stringify({
         mensagem: "Documento publicado com sucesso",
         documento,
       }),
     );
   } catch (error) {
-    console.error(error);
+    console.error("Erro ao publicar documento:", error);
 
     res.writeHead(500, {
       "Content-Type": "application/json",
     });
 
-    return res.end(
+    res.end(
       JSON.stringify({
         mensagem: "Erro ao publicar documento",
       }),
@@ -43,30 +45,28 @@ export async function publicarDocumento(req, res) {
   }
 }
 
-// Consultar todos os documentos
 export async function consultarDocumentos(req, res) {
   try {
-    const documentos = servicesEditorTexto.consultarDocumentos();
+    const documentos = await servicesEditorTexto.consultarDocumentos();
 
     res.writeHead(200, {
       "Content-Type": "application/json",
     });
 
-    return res.end(
+    res.end(
       JSON.stringify({
         mensagem: "Documentos consultados com sucesso",
         documentos,
-        artigos: documentos,
       }),
     );
   } catch (error) {
-    console.error(error);
+    console.error("Erro ao consultar documentos:", error);
 
     res.writeHead(500, {
       "Content-Type": "application/json",
     });
 
-    return res.end(
+    res.end(
       JSON.stringify({
         mensagem: "Erro ao consultar documentos",
       }),

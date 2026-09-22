@@ -1,43 +1,32 @@
 import { db } from "../database/database.mjs";
 
-export function publicarDocumento(data) {
-  const result = db
-    .prepare(
-      /*sql*/ `
-        INSERT INTO documentos (
-            titulo,
-            conteudoHtml
-        ) VALUES (
-            ?,
-            ?
-        )
-      `,
-    )
-    .run(data.titulo, data.conteudoHtml);
+export async function publicarDocumento(data) {
+  const result = await db.query(
+    `
+      INSERT INTO documentos (titulo, "conteudoHtml")
+      VALUES ($1, $2)
+      RETURNING id, titulo, "conteudoHtml", "dataCriacao"
+    `,
+    [data.titulo, data.conteudoHtml],
+  );
 
-  return {
-    id: Number(result.lastInsertRowid),
-    titulo: data.titulo,
-    conteudoHtml: data.conteudoHtml,
-  };
+  return result.rows[0];
 }
 
-export function consultarDocumentos() {
-  const documentos = db
-    .prepare(
-      /*sql*/ `
-        SELECT
-            id,
-            titulo,
-            conteudoHtml,
-            dataCriacao
-        FROM documentos
-        ORDER BY id DESC
-      `,
-    )
-    .all();
+export async function consultarDocumentos() {
+  const result = await db.query(
+    `
+      SELECT
+        id,
+        titulo,
+        "conteudoHtml",
+        "dataCriacao"
+      FROM documentos
+      ORDER BY id DESC
+    `,
+  );
 
-  return documentos;
+  return result.rows;
 }
 
 export const cadastrarDocumento = publicarDocumento;
