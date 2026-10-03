@@ -217,3 +217,14 @@
 }
 
 .fc-editor-pagina .fc-rotulo { margin-bottom: 10px; }
+
+/* ---------- Data e compartilhar no artigo ---------- */
+.fc-artigo-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 8px 0 30px;
+}
+.fc-artigo-info .fc-meta { margin: 0; }
+.fc-artigo-info .fc-opcoes { margin-right: -8px; }
