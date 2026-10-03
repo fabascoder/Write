@@ -938,3 +938,36 @@ html.fc-embed body { background: transparent; }
 .fc-leitura--escuro .fc-prosa a { color: #8fbdf5; }
 .fc-leitura--escuro .fc-leitura-ler { background: var(--azul); color: #fff; }
 .fc-leitura .fc-estado { color: inherit; opacity: 0.75; }
+
+/* ---------- Selo "Novo" ---------- */
+.fc-novo {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--azul);
+  font-family: var(--texto);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+}
+/* Dentro do balão azul o selo fica branco */
+.fc-opcoes-item .fc-novo {
+  margin-left: auto;
+  background: #fff;
+  color: var(--azul);
+}
+.fc-opcoes-ponto {
+  position: absolute;
+  top: 7px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--branco);
+  border-radius: 50%;
+  background: var(--azul);
+}
+.fc-opcoes-botao { position: relative; }

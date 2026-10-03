@@ -9,6 +9,7 @@ import TimelineView from "../home/TimelineView";
 import type { Visao } from "../home/ViewToggle";
 import AdminBar from "../admin/AdminBar";
 import ContaForm from "../admin/ContaForm";
+import Novidades from "../admin/Novidades";
 import ArtigoRow from "../home/ArtigoRow";
 import { Head } from "../layout/Head";
 
@@ -51,6 +52,7 @@ export default function Home() {
 
       <div className="fc-conteudo">
         {logado && <AdminBar />}
+        {logado && <Novidades />}
 
         {busca && (
           <p className="fc-busca-aviso">

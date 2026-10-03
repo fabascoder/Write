@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { copiarTexto, tituloCompartilhar, type TipoCompartilhamento } from "../../lib/compartilhar";
 import { ChevronRightIcon, LinkIcon, MoreIcon, PaletteIcon, ShareIcon } from "../icons";
+import NovoSelo from "./NovoSelo";
 import ShareDialog from "./ShareDialog";
+import { ehNovo } from "../../lib/novidades";
 import Toast from "./Toast";
 
 type Props = {
@@ -124,6 +126,8 @@ export default function OptionsMenu({ title, text, url, type = "article", image,
         aria-expanded={aberto}
       >
         <MoreIcon />
+        {/* Pontinho avisando que tem novidade dentro do menu */}
+        {ehNovo("compartilhar") && <span className="fc-opcoes-ponto" aria-hidden="true" />}
       </button>
 
       {aberto && (
@@ -156,11 +160,13 @@ export default function OptionsMenu({ title, text, url, type = "article", image,
                 <button type="button" role="menuitem" className="fc-opcoes-item" onClick={copiarLink}>
                   <LinkIcon />
                   Copiar link
+                  <NovoSelo id="compartilhar" />
                 </button>
                 {embedPath && (
                   <button type="button" role="menuitem" className="fc-opcoes-item" onClick={personalizar}>
                     <PaletteIcon />
                     Personalizar
+                    <NovoSelo id="compartilhar" />
                   </button>
                 )}
               </div>
