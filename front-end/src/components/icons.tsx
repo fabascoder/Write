@@ -150,3 +150,50 @@ export const PlusIcon = () => (
     <path d="M12 5v14M5 12h14" />
   </Icon>
 );
+
+// "..." do menu de opções
+export const MoreIcon = () => (
+  <Icon fill>
+    <circle cx="5" cy="12" r="1.9" />
+    <circle cx="12" cy="12" r="1.9" />
+    <circle cx="19" cy="12" r="1.9" />
+  </Icon>
+);
+
+export const ChevronRightIcon = () => (
+  <Icon>
+    <path d="m9 6 6 6-6 6" />
+  </Icon>
+);
+
+export const PaletteIcon = () => (
+  <Icon>
+    <path d="M12 3a9 9 0 0 0 0 18c1.2 0 1.8-.9 1.8-1.8 0-1.2-1-1.6-1-2.7 0-1 .8-1.7 1.8-1.7H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3Z" />
+    <circle cx="7.5" cy="11" r="1.1" fill="currentColor" stroke="none" />
+    <circle cx="10.5" cy="7" r="1.1" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="7.5" r="1.1" fill="currentColor" stroke="none" />
+  </Icon>
+);
+
+// Três pontos ligados, o ícone clássico de compartilhar
+export const ShareIcon = () => (
+  <Icon>
+    <circle cx="18" cy="5" r="2.6" />
+    <circle cx="6" cy="12" r="2.6" />
+    <circle cx="18" cy="19" r="2.6" />
+    <path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4" />
+  </Icon>
+);
+
+export const LinkIcon = () => (
+  <Icon>
+    <path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2" />
+    <path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2" />
+  </Icon>
+);
+
+export const CheckIcon = () => (
+  <Icon>
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </Icon>
+);

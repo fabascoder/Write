@@ -1,7 +1,21 @@
-// Endereço da API. Em produção, defina VITE_API_URL no .env
 import { tempo } from "./format";
-export const API_URL =
-  import.meta.env.VITE_API_URL ?? "https://writeapi.onrender.com";
+
+// Endereço da API, escolhido nesta ordem:
+// 1. VITE_API_URL no .env, se existir (força um endereço qualquer)
+// 2. `npm run dev:prod` → API de produção, com o front rodando local
+// 3. `npm run dev`      → API local (back-end rodando em localhost:3000)
+// 4. build (Vercel)     → API de produção
+export const API_LOCAL = "http://localhost:3000";
+export const API_PRODUCAO = "https://writeapi.onrender.com";
+
+const usarLocal = import.meta.env.DEV && import.meta.env.MODE !== "producao";
+
+export const API_URL: string =
+  import.meta.env.VITE_API_URL || (usarLocal ? API_LOCAL : API_PRODUCAO);
+
+if (import.meta.env.DEV) {
+  console.info(`[Write] usando a API: ${API_URL}`);
+}
 
 export type Artigo = {
   id: string | number;

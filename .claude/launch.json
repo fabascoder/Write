@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "api-local",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "process.chdir('back-end'); import('./back-end/server.mjs')"],
+      "port": 3000
+    },
+    {
+      "name": "front-end",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "front-end", "run", "dev"],
+      "port": 5173
+    }
+  ]
+}

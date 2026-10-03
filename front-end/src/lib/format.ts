@@ -105,3 +105,9 @@ export function agruparPorMes(artigos: Artigo[]): GrupoMes[] {
 
   return [...grupos.values()].sort((a, b) => b.chave.localeCompare(a.chave));
 }
+
+// O Quill 2 salva os espaços como &nbsp;. Aí o parágrafo inteiro vira uma
+// "palavra" só e o navegador quebra as linhas no meio das palavras.
+export function htmlLegivel(html: string | undefined) {
+  return (html ?? "").replace(/&nbsp;|\u00a0/g, " ");
+}
