@@ -3,10 +3,11 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useArtigos } from "../../hooks/useArtigos";
 import { useAdmin } from "../../hooks/useAdmin";
 import { excluirArtigo } from "../../lib/api";
-import { dataPorExtenso, tempoRelativo } from "../../lib/format";
+import { dataPorExtenso, htmlLegivel, resumo, tempoRelativo } from "../../lib/format";
 import { ArrowLeftIcon, PenIcon, TrashIcon } from "../icons";
 import ConfirmDialog from "../layout/ConfirmDialog";
 import { Head } from "../layout/Head";
+import OptionsMenu from "../layout/OptionsMenu";
 
 export default function Article() {
   const { id } = useParams();
@@ -97,13 +98,24 @@ export default function Article() {
           )}
         </div>
 
-        <p className="fc-meta">
-          <span>{tempoRelativo(artigo.dataCriacao)}</span>
-          <span aria-hidden="true">|</span>
-          <time>{dataPorExtenso(artigo.dataCriacao)}</time>
-        </p>
+        <div className="fc-artigo-info">
+          <p className="fc-meta">
+            <span>{tempoRelativo(artigo.dataCriacao)}</span>
+            <span aria-hidden="true">|</span>
+            <time>{dataPorExtenso(artigo.dataCriacao)}</time>
+          </p>
 
-        <div className="fc-prosa" dangerouslySetInnerHTML={{ __html: artigo.conteudoHtml ?? "" }} />
+          <OptionsMenu
+            title={artigo.titulo}
+            text={resumo(artigo.conteudoHtml, 140)}
+            image={artigo.capaUrl}
+            date={dataPorExtenso(artigo.dataCriacao)}
+            embedPath={`/embed/artigo/${artigo.id}`}
+            type="article"
+          />
+        </div>
+
+        <div className="fc-prosa" dangerouslySetInnerHTML={{ __html: htmlLegivel(artigo.conteudoHtml) }} />
       </article>
 
       <ConfirmDialog

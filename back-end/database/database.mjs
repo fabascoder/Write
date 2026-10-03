@@ -16,7 +16,8 @@ export const db = usePostgres
     })
   : {
       async query(sql, params = []) {
-        const sqlText = String(sql).trim();
+        // $1, $2... (Postgres) viram ?1, ?2... (parâmetros posicionais do SQLite)
+        const sqlText = String(sql).trim().replace(/\$(\d+)/g, "?$1");
         const statement = sqliteDb.prepare(sqlText);
 
         if (sqlText.toUpperCase().startsWith("INSERT")) {

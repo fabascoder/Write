@@ -379,3 +379,53 @@
   .fc-adminbar { justify-content: flex-start; }
   .fc-conta-form { grid-template-columns: 1fr; justify-content: stretch; }
 }
+
+/* ---------- Selos de novidade (área logada) ---------- */
+.fc-novidades { margin-bottom: 34px; }
+.fc-novidades ul { display: grid; gap: 12px; }
+.fc-novidade {
+  padding: 16px 18px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+}
+.fc-novidade-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+.fc-novidade-topo strong {
+  font-family: var(--titulo);
+  font-size: 16px;
+  font-weight: 600;
+}
+.fc-novidade-resta {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--azul);
+}
+.fc-novidade-desc {
+  margin: 4px 0 12px;
+  font-size: 14px;
+  color: var(--tinta-2);
+}
+.fc-novidade-barra {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--azul-claro);
+}
+.fc-novidade-barra span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--azul);
+}
+.fc-novidade-data {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--tinta-3);
+}
+.fc-novidade.is-expirada .fc-novidade-resta { color: var(--tinta-3); }
+.fc-novidade.is-expirada .fc-novidade-barra span { background: var(--linha); }
