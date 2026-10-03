@@ -114,7 +114,9 @@ const server = createServer(async (req, res) => {
     req.body = body;
 
     // Localiza a rota
-    const handler = router.find(req.method, url.pathname);
+    // HEAD usa a rota do GET (o Node não manda o corpo). Monitores como o
+    // UptimeRobot checam com HEAD; sem isso o "/" respondia 404.
+    const handler = router.find(req.method === "HEAD" ? "GET" : req.method, url.pathname);
 
     if (handler) {
       await handler(req, res);
