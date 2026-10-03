@@ -3,10 +3,32 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { BellIcon, HeartIcon, LogOutIcon, ShieldIcon, UserIcon } from "../icons";
 
-// "Fabricio 👤" no rodapé, para quem está logado. Abre o menu da conta
-// no mesmo balão azul do menu de opções do artigo.
-export default function UserMenu() {
-  const { usuario, pode, sair } = useAuth();
+// Foto padrão de perfil: círculo preto com a silhueta em branco
+function Avatar() {
+  return (
+    <span className="fc-avatar" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="12" fill="currentColor" />
+        <circle cx="12" cy="9.4" r="4.3" fill="#fff" />
+        <path d="M4.5 20.1C5.8 16.6 8.6 14.9 12 14.9s6.2 1.7 7.5 5.2A11 11 0 0 1 4.5 20.1Z" fill="#fff" />
+      </svg>
+    </span>
+  );
+}
+
+type Props = {
+  /**
+   * trilho    → coluna da direita, junto do Instagram e do GitHub (desktop)
+   * cabecalho → no topo, ao lado do ☰ (celular, onde a trilha vai para o rodapé)
+   */
+  lugar: "trilho" | "cabecalho";
+};
+
+// Conta do usuário.
+//   visitante → só a foto padrão; clicar abre o login
+//   logado    → "Olá, Nome" + foto; clicar abre o menu da conta
+export default function UserMenu({ lugar }: Props) {
+  const { usuario, carregando, pode, sair, abrirLogin } = useAuth();
   const navigate = useNavigate();
   const [aberto, setAberto] = useState(false);
   const caixaRef = useRef<HTMLDivElement>(null);
@@ -28,7 +50,23 @@ export default function UserMenu() {
     return () => document.removeEventListener("mousedown", fora);
   }, [aberto, fechar]);
 
-  if (!usuario) return null;
+  if (!usuario) {
+    return (
+      <div className={`fc-conta fc-conta--${lugar}`}>
+        <button
+          type="button"
+          className="fc-conta-botao"
+          onClick={() => abrirLogin()}
+          aria-label="Entrar ou criar conta"
+          title="Entrar ou criar conta"
+          // Enquanto a sessão carrega, o espaço fica reservado (sem piscar)
+          style={carregando ? { visibility: "hidden" } : undefined}
+        >
+          <Avatar />
+        </button>
+      </div>
+    );
+  }
 
   function teclado(e: KeyboardEvent) {
     if (!aberto) return;
@@ -55,21 +93,27 @@ export default function UserMenu() {
   const admin = pode("admin:acessar");
 
   return (
-    <div className="fc-opcoes fc-usuario" ref={caixaRef} onKeyDown={teclado}>
+    <div className={`fc-conta fc-conta--${lugar} fc-opcoes is-logado`} ref={caixaRef} onKeyDown={teclado}>
       <button
         ref={botaoRef}
         type="button"
-        className="fc-access fc-usuario-botao"
+        className={"fc-conta-botao" + (aberto ? " is-open" : "")}
         onClick={() => setAberto((a) => !a)}
         aria-haspopup="menu"
         aria-expanded={aberto}
+        aria-label={`Minha conta: ${usuario.nome}`}
       >
-        {primeiroNome}
-        <UserIcon />
+        <span className="fc-conta-nome">Olá, {primeiroNome}</span>
+        <Avatar />
       </button>
 
       {aberto && (
-        <div className="fc-opcoes-menu fc-opcoes-menu--cima" role="menu" aria-label="Minha conta">
+        <div className="fc-opcoes-menu fc-conta-menu" role="menu" aria-label="Minha conta">
+          <div className="fc-conta-quem">
+            <strong>{usuario.nome}</strong>
+            <span>{usuario.email}</span>
+          </div>
+
           <Link to="/perfil" role="menuitem" className="fc-opcoes-item" onClick={() => fechar()}>
             <UserIcon />
             Meu perfil

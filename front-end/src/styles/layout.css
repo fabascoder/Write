@@ -202,13 +202,14 @@
   gap: 24px;
   color: var(--azul);
 }
-.fc-social a {
+/* > a: só os ícones de redes, não os links do menu da conta que também ficam aqui */
+.fc-social > a {
   display: block;
   width: 26px;
   height: 26px;
   transition: transform 0.22s var(--suave), opacity 0.22s var(--suave);
 }
-.fc-social a:hover {
+.fc-social > a:hover {
   transform: translateY(-2px) scale(1.08);
   opacity: 0.85;
 }
@@ -1039,18 +1040,102 @@ html.fc-embed body { background: transparent; }
 .fc-precisa-entrar p { color: var(--tinta-2); }
 .fc-precisa-entrar div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
 
-/* ---------- Menu da conta (rodapé) ---------- */
-.fc-usuario-botao svg { transition: none; }
-.fc-usuario-botao:hover svg { transform: none; }
+/* ---------- Conta (foto de perfil + menu) ---------- */
+/* Desktop: na trilha da direita, acima do Instagram e do GitHub.
+   Celular: no cabeçalho, porque a trilha vai para o rodapé. */
+.fc-conta { position: relative; display: flex; flex-shrink: 0; }
 
-/* Balão abrindo para cima, porque o botão fica no rodapé */
-.fc-opcoes-menu--cima {
-  top: auto;
-  bottom: calc(100% + 12px);
+.fc-conta-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--titulo);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tinta);
+  white-space: nowrap;
+  cursor: pointer;
 }
-.fc-opcoes-menu--cima::before {
-  top: auto;
-  bottom: -7px;
+
+.fc-conta-nome {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Foto padrão: círculo preto com a silhueta */
+.fc-avatar {
+  display: block;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  color: var(--tinta);
+  transition: transform 0.22s var(--suave), opacity 0.22s var(--suave);
+}
+/* Mesmo efeito dos ícones de redes sociais */
+.fc-conta-botao:hover .fc-avatar,
+.fc-conta-botao.is-open .fc-avatar {
+  transform: translateY(-2px) scale(1.08);
+  opacity: 0.85;
+}
+
+/* Na trilha: mesmo tamanho dos ícones de redes, alinhado pela direita,
+   e um respiro maior até o Instagram */
+.fc-social { justify-items: end; }
+.fc-conta--trilho { margin-bottom: 22px; }
+.fc-conta--trilho .fc-avatar { width: 26px; height: 26px; }
+.fc-conta--trilho .fc-opcoes-menu::before { right: 6px; } /* seta no meio do ícone */
+
+/* "Olá, Nome" ao lado da foto só quando sobra margem ao lado do conteúdo;
+   em telas menores ele cobriria os botões do artigo (o nome aparece no menu) */
+@media (max-width: 1399px) {
+  .fc-conta--trilho .fc-conta-nome { display: none; }
+}
+
+/* Nome e e-mail no topo do menu */
+.fc-conta-menu { min-width: 240px; }
+.fc-conta-quem {
+  display: grid;
+  gap: 2px;
+  margin: 2px 2px 8px;
+  padding: 4px 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+.fc-conta-quem strong { font-family: var(--titulo); font-size: 15px; font-weight: 600; }
+.fc-conta-quem span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* PT | EN dentro do menu ☰ só aparece no celular */
+.fc-lang--menu { display: none; }
+
+/* Cada lugar no seu tamanho de tela */
+.fc-conta--cabecalho { display: none; }
+
+@media (max-width: 900px) {
+  .fc-conta--trilho { display: none; }
+  .fc-conta--cabecalho { display: flex; }
+
+  /* Ordem no celular: marca … conta, PT | EN, ☰ */
+  .fc-header-nav ~ .fc-conta { order: 1; margin-left: auto; }
+  .fc-header-nav ~ .fc-lang { order: 2; }
+  .fc-header-nav ~ .fc-only-mobile { order: 3; margin-left: 0; }
+  .fc-header .fc-header-nav { order: 4; }
+}
+
+/* Celular estreito: não cabe tudo na linha de cima, então o idioma vai para o ☰
+   e a conta mostra só a foto (o nome aparece no topo do menu) */
+@media (max-width: 480px) {
+  .fc-header-nav ~ .fc-lang { display: none; }
+  .fc-header-nav .fc-lang--menu { display: flex; }
+  .fc-conta--cabecalho .fc-conta-nome { display: none; }
 }
 .fc-opcoes-item[aria-disabled="true"] {
   opacity: 0.6;
