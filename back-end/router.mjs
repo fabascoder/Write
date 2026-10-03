@@ -3,6 +3,7 @@ export class Router {
     GET: {},
     POST: {},
     PUT: {},
+    PATCH: {},
     DELETE: {},
   };
 
@@ -16,6 +17,10 @@ export class Router {
 
   put(route, handle) {
     this.routes["PUT"][route] = handle;
+  }
+
+  patch(route, handle) {
+    this.routes["PATCH"][route] = handle;
   }
 
   delete(route, handle) {
@@ -53,8 +58,12 @@ export class Router {
     const methodRoutes = this.routes[method] ?? {};
     const exactMatch = methodRoutes[route];
 
+    // req.rota guarda o padrão da rota (ex.: "/documentos/:id"), usado nas métricas
     if (exactMatch) {
-      return exactMatch;
+      return (req, res) => {
+        req.rota = route;
+        return exactMatch(req, res);
+      };
     }
 
     for (const [pattern, handler] of Object.entries(methodRoutes)) {
@@ -62,6 +71,7 @@ export class Router {
 
       if (params) {
         return (req, res) => {
+          req.rota = pattern;
           req.params = { ...(req.params || {}), ...params };
           return handler(req, res);
         };

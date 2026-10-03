@@ -2,7 +2,23 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CATEGORIAS } from "../../lib/categorias";
 import Brand from "./Brand";
+import UserMenu from "./UserMenu";
 import { ChevronDownIcon, CloseIcon, MenuIcon, SearchIcon } from "../icons";
+
+// PT | EN. No celular ele também aparece dentro do menu ☰ (ver layout.css)
+function Idioma({ noMenu = false }: { noMenu?: boolean }) {
+  return (
+    <div className={"fc-lang" + (noMenu ? " fc-lang--menu" : "")} aria-label="Idioma">
+      <button type="button" className="is-active" aria-current="true">
+        PT
+      </button>
+      <span aria-hidden="true">|</span>
+      <button type="button" disabled title="Tradução ainda não disponível">
+        EN
+      </button>
+    </div>
+  );
+}
 
 type Props = {
   /** No editor o cabeçalho fica só com a marca e o idioma, como no layout */
@@ -90,6 +106,8 @@ export default function Header({ simples = false }: Props) {
                 <SearchIcon />
               </button>
             </form>
+
+            <Idioma noMenu />
           </div>
 
           <button
@@ -103,15 +121,8 @@ export default function Header({ simples = false }: Props) {
         </>
       )}
 
-      <div className="fc-lang" aria-label="Idioma">
-        <button type="button" className="is-active" aria-current="true">
-          PT
-        </button>
-        <span aria-hidden="true">|</span>
-        <button type="button" disabled title="Tradução ainda não disponível">
-          EN
-        </button>
-      </div>
+      <Idioma />
+      <UserMenu lugar="cabecalho" />
     </header>
   );
 }

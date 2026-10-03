@@ -4,6 +4,7 @@ import { ChevronRightIcon, LinkIcon, MoreIcon, PaletteIcon, ShareIcon } from "..
 import NovoSelo from "./NovoSelo";
 import ShareDialog from "./ShareDialog";
 import { ehNovo } from "../../lib/novidades";
+import { iniciarMedicao } from "../../lib/medicao";
 import Toast from "./Toast";
 
 type Props = {
@@ -35,6 +36,7 @@ export default function OptionsMenu({ title, text, url, type = "article", image,
   const caixaRef = useRef<HTMLDivElement>(null);
   const botaoRef = useRef<HTMLButtonElement>(null);
   const compartilharRef = useRef<HTMLButtonElement>(null);
+  const medirPersonalizar = useRef<ReturnType<typeof iniciarMedicao> | null>(null);
 
   const fecharMenu = useCallback((devolverFoco = false) => {
     setAberto(false);
@@ -102,6 +104,8 @@ export default function OptionsMenu({ title, text, url, type = "article", image,
   }
 
   function personalizar() {
+    // Desempenho: do clique em Personalizar até o modal aparecer
+    medirPersonalizar.current = iniciarMedicao("personalizar");
     fecharMenu();
     setModal(true);
   }
@@ -186,6 +190,7 @@ export default function OptionsMenu({ title, text, url, type = "article", image,
           chapter={chapter}
           date={date}
           embedPath={embedPath}
+          aoAbrir={() => medirPersonalizar.current?.({ detalhes: { capa: image ? 1 : 0 } })}
         />
       )}
 

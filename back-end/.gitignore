@@ -2,3 +2,5 @@ node_modules/
 .env
 *.sqlite
 *.db
+# Chave dos logins gerada no computador (ver auth/config.mjs)
+.jwt-secret

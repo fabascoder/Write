@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
-import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import { atualizarArtigo, publicarArtigo } from "../../lib/api";
+import { atualizarArtigo, ErroApi, publicarArtigo } from "../../lib/api";
 import { CATEGORIAS } from "../../lib/categorias";
 import { lerRascunhos, removerRascunho, salvarRascunho } from "../../lib/rascunhos";
-import { useAdmin } from "../../hooks/useAdmin";
 import { useArtigos } from "../../hooks/useArtigos";
 import { ArrowLeftIcon, BookIcon, CloseIcon } from "../icons";
 import { Head } from "../layout/Head";
@@ -38,11 +37,9 @@ type Status = { tipo: "ok" | "erro"; texto: string } | null;
 export default function Editor() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { logado } = useAdmin();
-
   // ?id=  → editando um artigo publicado | ?rascunho= → continuando um rascunho
   const idEdicao = params.get("id");
-  const { artigos, carregando } = useArtigos();
+  const { artigos, carregando } = useArtigos({ id: idEdicao, daRede: true });
   const artigoEditado = idEdicao ? artigos.find((a) => String(a.id) === idEdicao) : undefined;
 
   const rascunhoInicial = useMemo(() => {
@@ -67,8 +64,6 @@ export default function Editor() {
     setCategoria(artigoEditado.categoria ?? "");
     setTags(artigoEditado.tags ?? []);
   }, [artigoEditado]);
-
-  if (!logado) return <Navigate to="/" replace />;
 
   const editando = Boolean(idEdicao);
   const textoVazio = texto.replace(/<[^>]*>/g, "").trim() === "";
@@ -125,11 +120,15 @@ export default function Editor() {
       navigate("/");
     } catch (e) {
       console.error(e);
+      // 401/403: a sessão expirou ou a conta não tem permissão (mensagem vem da API)
+      const semAcesso = e instanceof ErroApi && (e.status === 401 || e.status === 403);
       setStatus({
         tipo: "erro",
-        texto: editando
-          ? "Não foi possível salvar as alterações. Confira se a API está no ar."
-          : "Não foi possível publicar. Confira se a API está no ar.",
+        texto: semAcesso
+          ? e.message
+          : editando
+            ? "Não foi possível salvar as alterações. Confira se a API está no ar."
+            : "Não foi possível publicar. Confira se a API está no ar.",
       });
     } finally {
       setSalvando(false);

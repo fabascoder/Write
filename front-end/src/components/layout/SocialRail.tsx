@@ -1,9 +1,13 @@
 import { GithubIcon, InstagramIcon } from "../icons";
+import UserMenu from "./UserMenu";
 
-// Trilha lateral de redes sociais (troque os links pelos seus perfis)
+// Trilha lateral: a conta no topo e, abaixo, as redes sociais
+// (troque os links pelos seus perfis)
 export default function SocialRail() {
   return (
-    <div className="fc-social" aria-label="Redes sociais">
+    <div className="fc-social">
+      <UserMenu lugar="trilho" />
+
       <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
         <InstagramIcon />
       </a>

@@ -22,16 +22,27 @@ type Props = DadosCompartilhamento & {
   date?: string;
   /** Caminho do cartão personalizado, ex.: /embed/artigo/2 */
   embedPath: string;
+  /** Chamado quando o modal já está desenhado na tela (para medir o desempenho) */
+  aoAbrir?: () => void;
 };
 
 // Modal "Personalizar": cor, tamanho e trecho do cartão, com prévia,
 // link personalizado e código do <iframe>. Usa as classes dos outros modais.
-export default function ShareDialog({ fechar, text, image, date, embedPath, ...dados }: Props) {
+export default function ShareDialog({ fechar, text, image, date, embedPath, aoAbrir, ...dados }: Props) {
   const [p, setP] = useState<Personalizacao>(PERSONALIZACAO_PADRAO);
   const [mostrarCodigo, setMostrarCodigo] = useState(false);
   const [copiado, setCopiado] = useState(false);
   const [erroCopiar, setErroCopiar] = useState(false);
   const fecharRef = useRef<HTMLButtonElement>(null);
+  const aoAbrirRef = useRef(aoAbrir);
+
+  // Dois quadros depois de montar = o modal já apareceu na tela
+  useEffect(() => {
+    let quadro = requestAnimationFrame(() => {
+      quadro = requestAnimationFrame(() => aoAbrirRef.current?.());
+    });
+    return () => cancelAnimationFrame(quadro);
+  }, []);
 
   useEffect(() => {
     fecharRef.current?.focus();
