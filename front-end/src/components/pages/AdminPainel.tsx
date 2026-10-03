@@ -3,6 +3,7 @@ import { useArtigos } from "../../hooks/useArtigos";
 import { useAuth } from "../../hooks/useAuth";
 import { ActivityIcon, ArrowRightIcon, BookIcon, FileIcon, PenIcon, UserIcon } from "../icons";
 import Novidades from "../admin/Novidades";
+import Engajamento from "../admin/Engajamento";
 import { Head } from "../layout/Head";
 
 // /admin — ponto de partida da administração
@@ -21,6 +22,7 @@ export default function AdminPainel() {
     { para: "/editor", icone: <PenIcon />, titulo: "Novo artigo", texto: "Escrever e publicar", permissao: "artigos:gerenciar" },
     { para: "/rascunhos", icone: <BookIcon />, titulo: "Rascunhos", texto: "Textos ainda não publicados", permissao: "artigos:gerenciar" },
     { para: "/admin/usuarios", icone: <UserIcon />, titulo: "Usuários", texto: "Contas e tipos de acesso", permissao: "usuarios:gerenciar" },
+    { para: "/admin/leitura", icone: <BookIcon />, titulo: "Leitura", texto: "Tempo médio de leitura dos artigos", permissao: "artigos:gerenciar" },
     { para: "/admin/desempenho", icone: <ActivityIcon />, titulo: "Desempenho", texto: "Velocidade do site e dicas", permissao: "desempenho:ver" },
   ].filter((a) => pode(a.permissao));
 
@@ -47,6 +49,8 @@ export default function AdminPainel() {
           </li>
         ))}
       </ul>
+
+      <Engajamento podeUsuarios={pode("usuarios:gerenciar")} podeArtigos={pode("artigos:gerenciar")} />
 
       <Novidades />
     </main>

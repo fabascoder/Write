@@ -18,7 +18,10 @@ export type ValorAuth = {
 
   entrar: (email: string, senha: string) => Promise<Usuario>;
   cadastrar: (dados: Cadastro) => Promise<Usuario>;
+  /** Sai só da conta ativa; as outras contas conectadas continuam no navegador */
   sair: () => Promise<void>;
+  /** Passa a usar outra conta já conectada neste navegador (sem senha) */
+  trocarConta: (id: number) => Promise<Usuario>;
   atualizarUsuario: (usuario: Usuario) => void;
 
   /** Só para mostrar/esconder na tela. Quem protege de verdade é o back-end */

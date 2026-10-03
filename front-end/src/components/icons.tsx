@@ -273,3 +273,11 @@ export const ActivityIcon = () => (
     <path d="M3 12h4l3-8 4 16 3-8h4" />
   </Icon>
 );
+
+// Câmera: trocar a foto de perfil
+export const CameraIcon = () => (
+  <Icon>
+    <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.6-2.2h5.4L16.3 7h2.2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5Z" />
+    <circle cx="12" cy="12.8" r="3.4" />
+  </Icon>
+);

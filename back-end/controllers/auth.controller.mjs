@@ -3,19 +3,29 @@ import { ehErroDeDuplicado } from "../database/database.mjs";
 import { ipDe, lerCookies, lerJson, lerQuery, redirecionar, responder } from "../http.mjs";
 import { APP_URL, googleConfigurado } from "../auth/config.mjs";
 import { contaGoogle, urlDeAutorizacao } from "../auth/google.mjs";
-import { permissoesDe } from "../auth/permissoes.mjs";
+import { permissoesDe, pode } from "../auth/permissoes.mjs";
 import { conferirSenha, conferirSenhaFalsa, gerarHashSenha } from "../auth/senha.mjs";
-import { cookieApagado, criarSessao, encerrarSessao, montarCookie, usuarioDaSessao } from "../auth/sessao.mjs";
+import {
+  contasConectadas,
+  cookieApagado,
+  criarSessao,
+  idDaContaAtiva,
+  montarCookie,
+  sairDaConta,
+  sairDeTodas,
+  trocarDeConta,
+  usuarioDaSessao,
+} from "../auth/sessao.mjs";
 
 // Resposta de login/cadastro: o JWT vai no cookie httpOnly (o que o site usa) e
 // também no corpo, para quem testar a API direto (Authorization: Bearer).
-async function responderComSessao(res, status, usuario, extra = {}) {
-  const sessao = criarSessao(usuario);
+async function responderComSessao(req, res, status, usuario, extra = {}) {
+  const sessao = criarSessao(usuario, req);
   responder(
     res,
     status,
     { ...extra, usuario: await resumoDoUsuario(usuario), token: sessao.token, expiraEm: sessao.expiraEm },
-    [sessao.cookie],
+    sessao.cookies,
   );
 }
 import * as usuarios from "../services/usuario.service.mjs";
@@ -100,7 +110,7 @@ export async function cadastrar(req, res) {
       throw error;
     }
 
-    await responderComSessao(res, 201, usuario, { mensagem: "Conta criada." });
+    await responderComSessao(req, res, 201, usuario, { mensagem: "Conta criada." });
   } catch (error) {
     console.error("Erro no cadastro:", error);
     responder(res, 500, { mensagem: "Não foi possível criar a conta agora." });
@@ -136,7 +146,7 @@ export async function entrar(req, res) {
     }
 
     falhas.delete(ip);
-    await responderComSessao(res, 200, usuario);
+    await responderComSessao(req, res, 200, usuario);
   } catch (error) {
     console.error("Erro no login:", error);
     responder(res, 500, { mensagem: "Não foi possível entrar agora." });
@@ -146,7 +156,11 @@ export async function entrar(req, res) {
 // POST /auth/logout
 export async function sair(req, res) {
   try {
-    responder(res, 200, { mensagem: "Até logo." }, [encerrarSessao()]);
+    // { todas: true } desconecta todas as contas deste navegador
+    const todas = lerJson(req).todas === true;
+    const id = idDaContaAtiva(req);
+    const cookies = todas || id === null ? sairDeTodas() : sairDaConta(req, id);
+    responder(res, 200, { mensagem: "Até logo." }, cookies);
   } catch (error) {
     console.error("Erro ao sair:", error);
     responder(res, 500, { mensagem: "Não foi possível sair agora." });
@@ -179,6 +193,57 @@ export async function atualizarPerfil(req, res) {
   } catch (error) {
     console.error("Erro ao atualizar perfil:", error);
     responder(res, 500, { mensagem: "Não foi possível salvar agora." });
+  }
+}
+
+// ---------- Foto de perfil ----------
+// O navegador já manda a foto recortada (quadrada) e reduzida, em data URL.
+// Aqui só confere: tipo permitido, tamanho e se os bytes são mesmo daquele tipo.
+
+const FOTO_MAX_BYTES = 300 * 1024;
+const FOTO_DATA_URL = /^data:(image\/(?:webp|jpeg|png));base64,([A-Za-z0-9+/]+={0,2})$/;
+const ASSINATURAS = {
+  "image/jpeg": (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff,
+  "image/png": (b) => b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])),
+  "image/webp": (b) => b.toString("ascii", 0, 4) === "RIFF" && b.toString("ascii", 8, 12) === "WEBP",
+};
+
+// PUT /auth/eu/foto  { imagem: "data:image/webp;base64,..." }  (exige login)
+export async function enviarFoto(req, res) {
+  try {
+    // Base64 ocupa ~4/3 do arquivo: corta antes de decodificar algo enorme
+    if (String(req.body ?? "").length > FOTO_MAX_BYTES * 1.5) {
+      return responder(res, 413, { mensagem: "A foto ficou grande demais. Tente outra imagem." });
+    }
+
+    const partes = FOTO_DATA_URL.exec(String(lerJson(req).imagem ?? ""));
+    if (!partes) return responder(res, 400, { mensagem: "Envie uma imagem JPG, PNG ou WebP." });
+
+    const [, tipo, base64] = partes;
+    const bytes = Buffer.from(base64, "base64");
+    if (bytes.length === 0 || bytes.length > FOTO_MAX_BYTES) {
+      return responder(res, 413, { mensagem: "A foto ficou grande demais. Tente outra imagem." });
+    }
+    if (!ASSINATURAS[tipo](bytes)) {
+      return responder(res, 400, { mensagem: "Esse arquivo não parece ser uma imagem válida." });
+    }
+
+    const usuario = await usuarios.salvarFoto(req.usuario.id, tipo, bytes.toString("base64"));
+    responder(res, 200, { mensagem: "Foto atualizada.", usuario: await resumoDoUsuario(usuario) });
+  } catch (error) {
+    console.error("Erro ao salvar foto:", error);
+    responder(res, 500, { mensagem: "Não foi possível salvar a foto agora." });
+  }
+}
+
+// DELETE /auth/eu/foto  (exige login)
+export async function removerFoto(req, res) {
+  try {
+    const usuario = await usuarios.apagarFoto(req.usuario.id);
+    responder(res, 200, { mensagem: "Foto removida.", usuario: await resumoDoUsuario(usuario) });
+  } catch (error) {
+    console.error("Erro ao remover foto:", error);
+    responder(res, 500, { mensagem: "Não foi possível remover a foto agora." });
   }
 }
 
@@ -241,11 +306,52 @@ export async function googleCallback(req, res) {
     }
 
     // Deu tudo certo: volta para onde estava, ou para a página principal
-    const { cookie } = criarSessao(usuario);
-    const destino = caminhoSeguro(salvo.voltar) || "/";
-    redirecionar(res, `${APP_URL}${destino}`, [cookie, limpar]);
+    const { cookies } = criarSessao(usuario, req);
+    const destino = caminhoSeguro(salvo.voltar) || (pode(usuario, "admin:acessar") ? "/admin" : "/");
+    redirecionar(res, `${APP_URL}${destino}`, [...cookies, limpar]);
   } catch (error) {
     console.error("Erro no login com Google:", error);
     falhou();
   }
+}
+
+// ---------- Várias contas no mesmo navegador ----------
+
+// GET /auth/contas → contas conectadas neste navegador (a ativa vem marcada)
+export async function contas(req, res) {
+  try {
+    const ativa = idDaContaAtiva(req);
+    const lista = [];
+    for (const { usuarioId } of contasConectadas(req)) {
+      const u = await usuarios.buscarPorId(usuarioId);
+      if (u) lista.push({ ...usuarios.usuarioPublico(u), ativa: u.id === ativa });
+    }
+    responder(res, 200, { contas: lista });
+  } catch (error) {
+    console.error("Erro ao listar contas:", error);
+    responder(res, 500, { mensagem: "Não foi possível listar as contas." });
+  }
+}
+
+// POST /auth/trocar  { id } → passa a usar outra conta já conectada (sem senha)
+export async function trocar(req, res) {
+  try {
+    const id = Number(lerJson(req).id);
+    const cookies = trocarDeConta(req, id);
+    const usuario = cookies ? await usuarios.buscarPorId(id) : null;
+    if (!cookies || !usuario) {
+      return responder(res, 401, { mensagem: "Essa conta não está mais conectada. Entre de novo com a senha." });
+    }
+    responder(res, 200, { usuario: await resumoDoUsuario(usuario) }, cookies);
+  } catch (error) {
+    console.error("Erro ao trocar de conta:", error);
+    responder(res, 500, { mensagem: "Não foi possível trocar de conta." });
+  }
+}
+
+// POST /auth/contas/sair  { id } → desconecta uma conta específica
+export function sairDeUmaConta(req, res) {
+  const id = Number(lerJson(req).id);
+  if (!Number.isInteger(id)) return responder(res, 400, { mensagem: "Conta inválida." });
+  responder(res, 200, { mensagem: "Conta desconectada." }, sairDaConta(req, id));
 }

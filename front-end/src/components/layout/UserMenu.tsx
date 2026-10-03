@@ -1,10 +1,19 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { FotoConta } from "../auth/FotoConta";
 import { BellIcon, HeartIcon, LogOutIcon, ShieldIcon, UserIcon } from "../icons";
 
-// Foto padrão de perfil: círculo preto com a silhueta em branco
-function Avatar() {
+// Foto da conta. Sem foto: círculo preto com a silhueta em branco
+function Avatar({ foto }: { foto?: string | null }) {
+  return (
+    <FotoConta foto={foto} className="fc-avatar fc-avatar--foto">
+      <AvatarPadrao />
+    </FotoConta>
+  );
+}
+
+function AvatarPadrao() {
   return (
     <span className="fc-avatar" aria-hidden="true">
       <svg viewBox="0 0 24 24">
@@ -28,7 +37,7 @@ type Props = {
 //   visitante → só a foto padrão; clicar abre o login
 //   logado    → "Olá, Nome" + foto; clicar abre o menu da conta
 export default function UserMenu({ lugar }: Props) {
-  const { usuario, carregando, pode, sair, abrirLogin } = useAuth();
+  const { usuario, carregando, pode, abrirLogin } = useAuth();
   const navigate = useNavigate();
   const [aberto, setAberto] = useState(false);
   const caixaRef = useRef<HTMLDivElement>(null);
@@ -83,10 +92,10 @@ export default function UserMenu({ lugar }: Props) {
     }
   }
 
-  async function desconectar() {
+  // "Sair" abre a escolha de contas: sair desta, trocar para outra ou sair de todas
+  function desconectar() {
     fechar();
-    await sair();
-    navigate("/");
+    navigate("/contas");
   }
 
   const primeiroNome = usuario.nome.trim().split(/\s+/)[0];
@@ -104,7 +113,7 @@ export default function UserMenu({ lugar }: Props) {
         aria-label={`Minha conta: ${usuario.nome}`}
       >
         <span className="fc-conta-nome">Olá, {primeiroNome}</span>
-        <Avatar />
+        <Avatar foto={usuario.foto} />
       </button>
 
       {aberto && (

@@ -1,6 +1,6 @@
 import { db } from "../database/database.mjs";
 
-const CAMPOS = `id, nome, email, role, "dataCriacao", "dataAtualizacao"`;
+const CAMPOS = `id, nome, email, role, "dataCriacao", "dataAtualizacao", "fotoEm"`;
 
 // O que pode sair da API. Nunca inclui senhaHash.
 export function usuarioPublico(u) {
@@ -11,7 +11,16 @@ export function usuarioPublico(u) {
     email: u.email,
     role: u.role,
     dataCriacao: u.dataCriacao,
+    foto: enderecoDaFoto(u),
   };
+}
+
+// Caminho da foto na API, ou null. O "?v=" muda a cada foto nova, então o
+// navegador pode guardar a imagem em cache sem nunca mostrar uma antiga.
+function enderecoDaFoto(u) {
+  if (!u.fotoEm) return null;
+  const versao = new Date(u.fotoEm).getTime() || 0;
+  return `/usuarios/${u.id}/foto?v=${versao}`;
 }
 
 export function normalizarEmail(email) {
@@ -47,7 +56,7 @@ export async function buscarPorId(id) {
 export async function buscarPorProvedor(provedor, provedorId) {
   const result = await db.query(
     `
-      SELECT u.id, u.nome, u.email, u.role, u."dataCriacao", u."dataAtualizacao"
+      SELECT u.id, u.nome, u.email, u.role, u."dataCriacao", u."dataAtualizacao", u."fotoEm"
       FROM "usuarioProvedores" p
       JOIN usuarios u ON u.id = p."usuarioId"
       WHERE p.provedor = $1 AND p."provedorId" = $2
@@ -122,4 +131,34 @@ export async function mudarRole(id, role) {
 export async function contarAdmins() {
   const result = await db.query(`SELECT COUNT(*) AS total FROM usuarios WHERE role = 'admin'`);
   return Number(result.rows[0]?.total ?? 0);
+}
+
+// ---------- Foto de perfil ----------
+
+export async function salvarFoto(id, tipo, dados) {
+  await db.query(
+    `
+      INSERT INTO "fotosPerfil" ("usuarioId", tipo, dados)
+      VALUES ($1, $2, $3)
+      ON CONFLICT ("usuarioId") DO UPDATE SET tipo = excluded.tipo, dados = excluded.dados
+    `,
+    [id, tipo, dados],
+  );
+  // Data com milissegundos: duas fotos no mesmo segundo ainda ganham versões diferentes
+  const result = await db.query(
+    `UPDATE usuarios SET "fotoEm" = $1 WHERE id = $2 RETURNING ${CAMPOS}`,
+    [new Date().toISOString(), id],
+  );
+  return result.rows[0];
+}
+
+export async function apagarFoto(id) {
+  await db.query(`DELETE FROM "fotosPerfil" WHERE "usuarioId" = $1`, [id]);
+  const result = await db.query(`UPDATE usuarios SET "fotoEm" = NULL WHERE id = $1 RETURNING ${CAMPOS}`, [id]);
+  return result.rows[0];
+}
+
+export async function buscarFoto(id) {
+  const result = await db.query(`SELECT tipo, dados FROM "fotosPerfil" WHERE "usuarioId" = $1`, [id]);
+  return result.rows[0];
 }

@@ -668,7 +668,7 @@
 .fc-heroi-ajuda { max-width: 220px; font-size: 13px; color: var(--tinta-3); }
 
 /* Destaques (números com comparação ao período anterior) */
-.fc-destaques {
+.fc-numeros {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
@@ -882,4 +882,120 @@
   .fc-barra-item { grid-template-columns: 1fr; gap: 4px; }
   .fc-barra-nome { text-align: left; }
   .fc-barra-dica { left: 4px; }
+}
+
+/* ---------- Uso e leitura (painel do admin) ---------- */
+.fc-engaj { margin: 8px 0 40px; }
+.fc-engaj-grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+}
+.fc-engaj-cartao {
+  min-width: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+}
+.fc-engaj-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+  margin-bottom: 10px;
+}
+.fc-engaj-topo h3 { font-family: var(--titulo); font-size: 16px; font-weight: 600; }
+.fc-engaj-topo a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--azul);
+}
+.fc-engaj-topo a svg { width: 14px; height: 14px; }
+.fc-engaj-lista { display: grid; }
+.fc-engaj-lista li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--linha-2);
+}
+.fc-engaj-lista li:first-child { border-top: 0; }
+.fc-engaj-nome { display: grid; gap: 2px; min-width: 0; }
+.fc-engaj-nome strong { overflow: hidden; font-size: 14.5px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.fc-engaj-nome a:hover strong { color: var(--azul); }
+.fc-engaj-nome small { font-size: 12.5px; color: var(--tinta-3); }
+.fc-engaj-valor { flex-shrink: 0; font-weight: 600; color: var(--tinta); font-variant-numeric: tabular-nums; }
+.fc-engaj-vazio { padding: 8px 0; font-size: 14px; color: var(--tinta-3); }
+
+.fc-usuarios-tempo { color: var(--tinta-2) !important; }
+.fc-tabela-titulo { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+.fc-tabela-titulo a:hover { color: var(--azul); }
+
+/* ---------- Foto de perfil ---------- */
+/* Clicar na foto abre a escolha de arquivo; a câmera no canto mostra que dá */
+.fc-perfil-foto {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+.fc-perfil-foto:disabled { opacity: 0.6; cursor: progress; }
+.fc-perfil-foto:focus-visible { outline: 2px solid var(--azul); outline-offset: 3px; }
+.fc-perfil-foto .fc-perfil-avatar { width: 72px; height: 72px; font-size: 24px; }
+img.fc-perfil-avatar { display: block; object-fit: cover; background: var(--cinza); }
+.fc-perfil-foto-camera {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--branco);
+  border-radius: 50%;
+  background: var(--tinta);
+  color: var(--branco);
+  transition: background 0.2s var(--suave), transform 0.2s var(--suave);
+}
+.fc-perfil-foto-camera svg { width: 14px; height: 14px; }
+.fc-perfil-foto:hover:not(:disabled) .fc-perfil-foto-camera { background: var(--azul); transform: scale(1.08); }
+.fc-perfil-foto-acoes { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 6px; }
+.fc-perfil-foto-acoes button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--azul);
+  cursor: pointer;
+}
+.fc-perfil-foto-acoes button + button { color: var(--tinta-3); }
+.fc-perfil-foto-acoes button:hover:not(:disabled) { text-decoration: underline; }
+.fc-perfil-foto-acoes button:disabled { cursor: progress; }
+.fc-perfil-foto-aviso { margin: -10px 0 18px; }
+
+/* Lista de usuários do admin: foto ao lado do nome */
+.fc-usuarios-quem { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.fc-usuarios-foto {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--azul-claro);
+  object-fit: cover;
+  font-family: var(--titulo);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--azul);
 }

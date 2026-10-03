@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import * as api from "../lib/autenticacao";
 import type { Cadastro, Usuario } from "../lib/autenticacao";
 import { AuthContext, type PedidoLogin, type ValorAuth } from "./auth";
+import { useTempoLogado } from "../hooks/useTempoLogado";
 
 // Guarda quem está logado. O login em si é um JWT num cookie httpOnly:
 // este código nunca vê nem guarda o token, só pergunta ao back-end quem é.
@@ -12,6 +13,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [google, setGoogle] = useState(false);
+
+  // Tempo logado (para o painel do admin)
+  useTempoLogado(usuario?.id);
+
+  // Toda conta que entra fica lembrada na tela "Escolha uma conta"
+  useEffect(() => {
+    if (usuario) api.lembrarConta(usuario);
+  }, [usuario]);
 
   useEffect(() => {
     let ativo = true;
@@ -51,6 +60,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const trocarConta = useCallback(async (id: number) => {
+    const u = await api.trocarConta(id);
+    setUsuario(u);
+    return u;
+  }, []);
+
   const pode = useCallback((permissao: string) => Boolean(usuario?.permissoes.includes(permissao)), [usuario]);
 
   const abrirLogin = useCallback(
@@ -83,12 +98,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       entrar,
       cadastrar,
       sair,
+      trocarConta,
       atualizarUsuario: setUsuario,
       pode,
       abrirLogin,
       exigirLogin,
     }),
-    [usuario, carregando, google, entrar, cadastrar, sair, pode, abrirLogin, exigirLogin],
+    [usuario, carregando, google, entrar, cadastrar, sair, trocarConta, pode, abrirLogin, exigirLogin],
   );
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>;

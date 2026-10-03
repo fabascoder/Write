@@ -1,18 +1,31 @@
 import "dotenv/config";
 import { randomBytes } from "node:crypto";
+import { readFileSync, writeFileSync } from "node:fs";
 
 // Chave que assina os JWT. Precisa ser longa, aleatória e secreta.
-// Sem JWT_SECRET, gera uma chave só para esta execução: funciona, mas todo
-// mundo é deslogado quando o servidor reinicia. Em produção, defina a variável.
-export const JWT_SECRET =
-  process.env.JWT_SECRET ||
-  (() => {
-    console.warn(
-      "[auth] JWT_SECRET não definido: usando uma chave temporária. " +
-        "Defina JWT_SECRET no .env (e no Render) para os logins sobreviverem a reinícios.",
-    );
-    return randomBytes(48).toString("base64url");
-  })();
+// Sem JWT_SECRET, gera UMA chave e guarda no arquivo back-end/.jwt-secret
+// (fora do Git). Assim os logins sobrevivem quando o servidor reinicia
+// (o "npm run dev" reinicia a cada mudança no código). Em produção, defina a variável.
+const ARQUIVO_CHAVE = new URL("../.jwt-secret", import.meta.url);
+
+function chaveLocal() {
+  try {
+    const salva = readFileSync(ARQUIVO_CHAVE, "utf8").trim();
+    if (salva.length >= 32) return salva;
+  } catch {
+    /* ainda não existe */
+  }
+  const nova = randomBytes(48).toString("base64url");
+  try {
+    writeFileSync(ARQUIVO_CHAVE, nova, { mode: 0o600 });
+    console.warn("[auth] JWT_SECRET não definido: criei uma chave local em back-end/.jwt-secret.");
+  } catch {
+    console.warn("[auth] JWT_SECRET não definido e não deu para salvar a chave: os logins caem a cada reinício.");
+  }
+  return nova;
+}
+
+export const JWT_SECRET = process.env.JWT_SECRET || chaveLocal();
 
 if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
   console.warn("[auth] JWT_SECRET curto demais: use pelo menos 32 caracteres aleatórios.");

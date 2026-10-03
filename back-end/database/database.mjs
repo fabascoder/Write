@@ -100,6 +100,36 @@ const POSTGRES = /*sql*/ `
     "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
   CREATE INDEX IF NOT EXISTS metricas_acao_data ON metricas (acao, "dataCriacao");
+
+  -- Tempo de uso de quem está logado: cada linha é uma sessão (pausa de 5+ min abre outra)
+  CREATE TABLE IF NOT EXISTS "sessoesUso" (
+    id SERIAL PRIMARY KEY,
+    "usuarioId" INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    inicio TIMESTAMPTZ NOT NULL,
+    fim TIMESTAMPTZ NOT NULL,
+    segundos INTEGER NOT NULL DEFAULT 0
+  );
+  CREATE INDEX IF NOT EXISTS "sessoesUso_usuario_fim" ON "sessoesUso" ("usuarioId", fim);
+
+  -- Cada leitura de artigo: tempo com o texto na tela e até onde rolou (0 a 100%)
+  CREATE TABLE IF NOT EXISTS leituras (
+    id SERIAL PRIMARY KEY,
+    "documentoId" INTEGER NOT NULL REFERENCES documentos(id) ON DELETE CASCADE,
+    segundos INTEGER NOT NULL,
+    rolagem INTEGER NOT NULL,
+    "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+  CREATE INDEX IF NOT EXISTS leituras_documento ON leituras ("documentoId", "dataCriacao");
+
+  -- Foto de perfil, já recortada e reduzida no navegador (fica no banco porque
+  -- o disco do Render é apagado a cada deploy). "fotoEm" em usuarios diz se há
+  -- foto e serve de versão no endereço da imagem.
+  ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS "fotoEm" TIMESTAMPTZ;
+  CREATE TABLE IF NOT EXISTS "fotosPerfil" (
+    "usuarioId" INTEGER PRIMARY KEY REFERENCES usuarios(id) ON DELETE CASCADE,
+    tipo TEXT NOT NULL,
+    dados TEXT NOT NULL
+  );
 `;
 
 const SQLITE = /*sql*/ `
@@ -161,6 +191,30 @@ const SQLITE = /*sql*/ `
     dataCriacao TEXT NOT NULL DEFAULT (datetime('now'))
   );
   CREATE INDEX IF NOT EXISTS metricas_acao_data ON metricas (acao, dataCriacao);
+
+  CREATE TABLE IF NOT EXISTS sessoesUso (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuarioId INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    inicio TEXT NOT NULL,
+    fim TEXT NOT NULL,
+    segundos INTEGER NOT NULL DEFAULT 0
+  );
+  CREATE INDEX IF NOT EXISTS sessoesUso_usuario_fim ON sessoesUso (usuarioId, fim);
+
+  CREATE TABLE IF NOT EXISTS leituras (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    documentoId INTEGER NOT NULL REFERENCES documentos(id) ON DELETE CASCADE,
+    segundos INTEGER NOT NULL,
+    rolagem INTEGER NOT NULL,
+    dataCriacao TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS leituras_documento ON leituras (documentoId, dataCriacao);
+
+  CREATE TABLE IF NOT EXISTS fotosPerfil (
+    usuarioId INTEGER PRIMARY KEY REFERENCES usuarios(id) ON DELETE CASCADE,
+    tipo TEXT NOT NULL,
+    dados TEXT NOT NULL
+  );
 `;
 
 export async function inicializarBanco() {
@@ -171,5 +225,8 @@ export async function inicializarBanco() {
   }
 
   sqliteDb.exec(SQLITE);
+  // Bancos criados antes da foto de perfil: o SQLite não tem ADD COLUMN IF NOT EXISTS
+  const colunas = sqliteDb.prepare("PRAGMA table_info(usuarios)").all();
+  if (!colunas.some((c) => c.name === "fotoEm")) sqliteDb.exec("ALTER TABLE usuarios ADD COLUMN fotoEm TEXT");
   console.log("Banco local SQLite inicializado com sucesso.");
 }

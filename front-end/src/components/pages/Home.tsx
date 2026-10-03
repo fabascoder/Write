@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useArtigos } from "../../hooks/useArtigos";
 import { useAuth } from "../../hooks/useAuth";
 import { useMedirCarregamento } from "../../hooks/useMedirCarregamento";
@@ -45,6 +45,10 @@ export default function Home() {
     else novos.delete(chave);
     setParams(novos, { replace: true });
   }
+
+  // Para o admin, a página inicial é o painel. Busca e categorias (com ?busca=,
+  // ?categoria=...) continuam abrindo a lista normalmente.
+  if (pode("admin:acessar") && !params.toString()) return <Navigate to="/admin" replace />;
 
   return (
     <main className="fc-main">

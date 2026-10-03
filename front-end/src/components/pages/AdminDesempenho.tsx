@@ -140,7 +140,7 @@ function PainelAcao({ acao, dados, d, resumo }: { acao: Acao; dados?: ResumoAcao
       <p className="fc-desemp-descricao">{acao.descricao}.</p>
       <Veredito d={d} variacaoTexto={varMedia ? `Média ${varMedia.texto}.` : undefined} />
 
-      <dl className="fc-destaques">
+      <dl className="fc-numeros">
         <Destaque rotulo="Média" valor={ms(dados.media)} variacao={varMedia} />
         <Destaque rotulo="Mediana" valor={ms(dados.mediana)} variacao={variacao(dados.mediana, dados.anterior.mediana)} ajuda="Metade das vezes foi mais rápido que isso" />
         <Destaque rotulo="95% das vezes, até" valor={ms(dados.p95)} variacao={variacao(dados.p95, dados.anterior.p95)} ajuda="Só 5% das vezes passaram deste tempo" />
@@ -332,7 +332,7 @@ function PainelServidor({ resumo }: { resumo: Resumo }) {
         }}
       />
 
-      <dl className="fc-destaques">
+      <dl className="fc-numeros">
         <Destaque rotulo="Requisições" valor={numero(geral.total)} ajuda={`No período anterior: ${numero(geral.anterior.total)}`} />
         <Destaque rotulo="Média" valor={ms(geral.media)} variacao={variacao(geral.media, geral.anterior.media)} />
         <Destaque rotulo="95% das vezes, até" valor={ms(geral.p95)} variacao={variacao(geral.p95, geral.anterior.p95)} />
@@ -494,7 +494,7 @@ function PainelGeral({
         />
       </div>
 
-      <dl className="fc-destaques">
+      <dl className="fc-numeros">
         <Destaque rotulo="Medições no site" valor={numero(totalMedicoes)} />
         <Destaque rotulo="Áreas com problema" valor={`${comProblema} de ${ACOES.length}`} />
         <Destaque rotulo="Ações com erro" valor={totalMedicoes ? porcentagem(errosGerais / totalMedicoes, 1) : "—"} />

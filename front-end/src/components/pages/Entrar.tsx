@@ -22,14 +22,20 @@ export default function Entrar() {
   const voltar = caminhoSeguro(params.get("voltar"));
   const motivo = (state as { motivo?: string } | null)?.motivo;
 
-  const [email, setEmail] = useState("");
+  // Vindo da escolha de contas, o e-mail já chega preenchido
+  const [email, setEmail] = useState(params.get("email") ?? "");
   const [senha, setSenha] = useState("");
   const [erros, setErros] = useState<ErrosForm>({ geral: ERROS_GOOGLE[params.get("erro") ?? ""] });
   const [tentou, setTentou] = useState(false);
   const [enviando, setEnviando] = useState(false);
 
   // Já está logado: nada para fazer aqui
-  if (usuario && !enviando) return <Navigate to={voltar || "/"} replace />;
+  // Admin cai no painel; leitor, na página principal
+  const inicioDe = (permissoes: string[]) => (permissoes.includes("admin:acessar") ? "/admin" : "/");
+
+  // Já logado: vai embora, a não ser que esteja entrando com mais uma conta
+  const adicionandoConta = params.has("outra") || params.has("email");
+  if (usuario && !enviando && !adicionandoConta) return <Navigate to={voltar || inicioDe(usuario.permissoes)} replace />;
 
   // Depois da primeira tentativa, os erros somem conforme a pessoa corrige
   function revalidar(novoEmail: string, novaSenha: string) {
@@ -49,10 +55,10 @@ export default function Entrar() {
 
     try {
       setEnviando(true);
-      await entrar(email.trim(), senha);
+      const conta = await entrar(email.trim(), senha);
       medir({ status: 200, caminho: "/auth/login" });
       // Deu tudo certo: página principal (ou de volta para onde a pessoa estava)
-      navigate(voltar || "/", { replace: true });
+      navigate(voltar || inicioDe(conta.permissoes), { replace: true });
     } catch (e) {
       medir({ status: e instanceof ErroApi ? e.status : 0, caminho: "/auth/login" });
       const mensagem = e instanceof Error ? e.message : "Não foi possível entrar agora.";

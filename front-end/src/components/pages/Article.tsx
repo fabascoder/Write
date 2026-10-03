@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useArtigos } from "../../hooks/useArtigos";
 import { useAuth } from "../../hooks/useAuth";
 import { useMedirCarregamento } from "../../hooks/useMedirCarregamento";
+import { useTempoDeLeitura } from "../../hooks/useTempoDeLeitura";
 import { esperarImagens, imagensEmbutidas } from "../../lib/medicao";
 import { excluirArtigo } from "../../lib/api";
 import { dataPorExtenso, htmlLegivel, resumo, tempoRelativo } from "../../lib/format";
@@ -25,6 +26,9 @@ export default function Article() {
 
   // A API não tem GET por id, então o artigo é buscado na lista
   const artigo = artigos.find((a) => String(a.id) === id);
+
+  // Tempo de leitura (quem escreve não conta, senão a média do próprio autor entra)
+  useTempoDeLeitura(artigo?.id, Boolean(artigo) && !logado);
 
   // Desempenho: do clique até o texto e as fotos aparecerem
   useMedirCarregamento("abrir_artigo", Boolean(artigo), async () => {

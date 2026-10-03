@@ -11,6 +11,8 @@ export type Usuario = {
   email: string;
   role: Role;
   dataCriacao?: string;
+  /** Caminho da foto na API (use urlDaFoto), ou null para a foto padrão */
+  foto?: string | null;
   /** Vem do back-end. Usar para mostrar/esconder coisas, nunca como segurança */
   permissoes: string[];
   provedores: string[];
@@ -62,6 +64,25 @@ export async function atualizarNome(nome: string) {
     method: "PATCH",
     body: JSON.stringify({ nome }),
   });
+  return data.usuario;
+}
+
+// Endereço completo da foto de perfil, ou null
+export function urlDaFoto(foto?: string | null) {
+  return foto ? `${API_URL}${foto}` : null;
+}
+
+// PUT /auth/eu/foto — a imagem já vai pronta (ver lib/foto.ts)
+export async function enviarFoto(imagem: string) {
+  const data = await requisitar<{ usuario: Usuario }>("/auth/eu/foto", {
+    method: "PUT",
+    body: JSON.stringify({ imagem }),
+  });
+  return data.usuario;
+}
+
+export async function removerFoto() {
+  const data = await requisitar<{ usuario: Usuario }>("/auth/eu/foto", { method: "DELETE" });
   return data.usuario;
 }
 
@@ -133,4 +154,60 @@ export function caminhoSeguro(caminho: string | null | undefined) {
 // Mantém o ?voltar= ao trocar entre entrar e cadastro
 export function comVoltar(caminho: string, voltar?: string) {
   return voltar ? `${caminho}?voltar=${encodeURIComponent(voltar)}` : caminho;
+}
+
+// ---------- Várias contas no mesmo navegador ----------
+
+export type ContaConectada = UsuarioResumo & { ativa: boolean };
+
+export async function listarContasConectadas() {
+  const data = await requisitar<{ contas: ContaConectada[] }>("/auth/contas");
+  return data.contas;
+}
+
+export async function trocarConta(id: number) {
+  const data = await requisitar<{ usuario: Usuario }>("/auth/trocar", { method: "POST", body: JSON.stringify({ id }) });
+  return data.usuario;
+}
+
+export async function desconectarConta(id: number) {
+  await requisitar("/auth/contas/sair", { method: "POST", body: JSON.stringify({ id }) });
+}
+
+export async function sairDeTodas() {
+  await requisitar("/auth/logout", { method: "POST", body: JSON.stringify({ todas: true }) });
+}
+
+// Contas que já entraram neste navegador. Fica no localStorage só o que aparece
+// na tela (nome, e-mail, tipo) — nunca senha ou token. O login de verdade fica
+// no cookie httpOnly do servidor.
+export type ContaConhecida = { id: number; nome: string; email: string; role: Role; foto?: string | null; ultimaVez: string };
+
+const CHAVE_CONTAS = "write-contas";
+
+export function lerContasConhecidas(): ContaConhecida[] {
+  try {
+    const lista = JSON.parse(localStorage.getItem(CHAVE_CONTAS) ?? "[]");
+    return Array.isArray(lista) ? lista : [];
+  } catch {
+    return [];
+  }
+}
+
+function salvarContasConhecidas(lista: ContaConhecida[]) {
+  try {
+    localStorage.setItem(CHAVE_CONTAS, JSON.stringify(lista.slice(0, 8)));
+  } catch {
+    /* navegador sem localStorage: a lista só não aparece */
+  }
+}
+
+export function lembrarConta(u: { id: number; nome: string; email: string; role: Role; foto?: string | null }) {
+  const resto = lerContasConhecidas().filter((c) => c.id !== u.id);
+  const conta = { id: u.id, nome: u.nome, email: u.email, role: u.role, foto: u.foto ?? null, ultimaVez: new Date().toISOString() };
+  salvarContasConhecidas([conta, ...resto]);
+}
+
+export function esquecerConta(id: number) {
+  salvarContasConhecidas(lerContasConhecidas().filter((c) => c.id !== id));
 }

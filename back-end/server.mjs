@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.route.mjs";
 import usuarioRoutes from "./routes/usuario.route.mjs";
 import reacaoRoutes from "./routes/reacao.route.mjs";
 import metricaRoutes from "./routes/metrica.route.mjs";
+import engajamentoRoutes from "./routes/engajamento.route.mjs";
 import { registrarMetrica } from "./services/metrica.service.mjs";
 
 const router = new Router();
@@ -38,6 +39,9 @@ reacaoRoutes(router);
 // Desempenho do sistema
 metricaRoutes(router);
 
+// Tempo logado e tempo de leitura
+engajamentoRoutes(router);
+
 // Cronômetro de cada requisição:
 // - manda o tempo no cabeçalho Server-Timing (o navegador separa servidor x rede)
 // - guarda o tempo e o tamanho da resposta para o painel de desempenho
@@ -59,7 +63,7 @@ function medirRequisicao(req, res) {
 
   res.on("finish", () => {
     // As próprias métricas não entram na conta
-    if (req.method === "OPTIONS" || req.rota?.startsWith("/metricas")) return;
+    if (req.method === "OPTIONS" || req.rota?.startsWith("/metricas") || req.rota === "/atividade" || req.rota === "/leituras") return;
     registrarMetrica({
       origem: "servidor",
       acao: "api",

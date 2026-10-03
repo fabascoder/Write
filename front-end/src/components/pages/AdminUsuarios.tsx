@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { listarUsuarios, mudarRole, NOME_ROLE, type Role, type UsuarioResumo } from "../../lib/autenticacao";
+import { buscarTempoUsuarios, duracao, type TempoUsuario } from "../../lib/engajamento";
+import { tempoRelativo } from "../../lib/format";
 import { dataPorExtenso } from "../../lib/format";
+import { iniciais } from "../../lib/perfil";
+import { FotoConta } from "../auth/FotoConta";
 import { ArrowLeftIcon } from "../icons";
 import { Head } from "../layout/Head";
 
@@ -16,6 +20,18 @@ export default function AdminUsuarios() {
   const [carregando, setCarregando] = useState(true);
   const [aviso, setAviso] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
   const [salvandoId, setSalvandoId] = useState<number | null>(null);
+  const [tempos, setTempos] = useState<Map<number, TempoUsuario>>(new Map());
+
+  // Tempo logado de cada um nos últimos 30 dias
+  useEffect(() => {
+    let ativo = true;
+    buscarTempoUsuarios(30)
+      .then((r) => ativo && setTempos(new Map(r.usuarios.map((u) => [u.id, u]))))
+      .catch(() => {});
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   useEffect(() => {
     let ativo = true;
@@ -68,13 +84,26 @@ export default function AdminUsuarios() {
             const souEu = u.id === eu?.id;
             return (
               <li key={u.id} className="fc-usuarios-item">
-                <div className="fc-usuarios-dados">
-                  <strong>
-                    {u.nome}
-                    {souEu && <>{" "}<span className="fc-usuarios-voce">você</span></>}
-                  </strong>
-                  <span>{u.email}</span>
-                  {u.dataCriacao && <small>desde {dataPorExtenso(u.dataCriacao)}</small>}
+                <div className="fc-usuarios-quem">
+                  <FotoConta foto={u.foto} className="fc-usuarios-foto">
+                    <span className="fc-usuarios-foto" aria-hidden="true">
+                      {iniciais(u.nome)}
+                    </span>
+                  </FotoConta>
+                  <div className="fc-usuarios-dados">
+                    <strong>
+                      {u.nome}
+                      {souEu && <>{" "}<span className="fc-usuarios-voce">você</span></>}
+                    </strong>
+                    <span>{u.email}</span>
+                    {u.dataCriacao && <small>desde {dataPorExtenso(u.dataCriacao)}</small>}
+                    <small className="fc-usuarios-tempo">
+                      {tempos.get(u.id)?.segundos
+                        ? `${duracao(tempos.get(u.id)?.segundos)} logado em 30 dias · ${tempos.get(u.id)?.sessoes} ${tempos.get(u.id)?.sessoes === 1 ? "sessão" : "sessões"} · média ${duracao(tempos.get(u.id)?.mediaSessao)}`
+                        : "Sem uso logado nos últimos 30 dias"}
+                      {tempos.get(u.id)?.ultimaVez && ` · visto ${tempoRelativo(tempos.get(u.id)?.ultimaVez)}`}
+                    </small>
+                  </div>
                 </div>
 
                 <label className="fc-campo fc-usuarios-role">

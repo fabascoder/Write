@@ -1,4 +1,4 @@
-import { lerJson, responder } from "../http.mjs";
+import { lerJson, lerQuery, responder } from "../http.mjs";
 import { ROLES } from "../auth/permissoes.mjs";
 import * as usuarios from "../services/usuario.service.mjs";
 
@@ -38,5 +38,28 @@ export async function mudarRole(req, res) {
   } catch (error) {
     console.error("Erro ao mudar role:", error);
     responder(res, 500, { mensagem: "Não foi possível atualizar agora." });
+  }
+}
+
+// GET /usuarios/:id/foto  (pública: a foto aparece para quem vê a conta)
+export async function foto(req, res) {
+  try {
+    const id = Number(req.params.id);
+    const salva = Number.isInteger(id) && id > 0 ? await usuarios.buscarFoto(id) : null;
+    if (!salva) return responder(res, 404, { mensagem: "Foto não encontrada." });
+
+    const bytes = Buffer.from(salva.dados, "base64");
+    // Com "?v=" o endereço muda a cada foto nova, então dá para guardar por 1 ano
+    const versionada = lerQuery(req).has("v");
+    res.writeHead(200, {
+      "Content-Type": salva.tipo,
+      "Content-Length": bytes.length,
+      "Cache-Control": versionada ? "public, max-age=31536000, immutable" : "public, max-age=300",
+      "X-Content-Type-Options": "nosniff",
+    });
+    res.end(bytes);
+  } catch (error) {
+    console.error("Erro ao buscar foto:", error);
+    responder(res, 500, { mensagem: "Não foi possível carregar a foto." });
   }
 }

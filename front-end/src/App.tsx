@@ -9,6 +9,7 @@ import Rascunhos from "./components/pages/Rascunhos";
 import Embed from "./components/pages/Embed";
 import Entrar from "./components/pages/Entrar";
 import Cadastro from "./components/pages/Cadastro";
+import Contas from "./components/pages/Contas";
 import Perfil from "./components/pages/Perfil";
 import AdminPainel from "./components/pages/AdminPainel";
 import AdminArtigos from "./components/pages/AdminArtigos";
@@ -17,6 +18,7 @@ import RotaProtegida from "./components/auth/RotaProtegida";
 
 // O painel de desempenho (com a biblioteca de gráficos) só é baixado quando o admin abre a página
 const AdminDesempenho = lazy(() => import("./components/pages/AdminDesempenho"));
+const AdminLeitura = lazy(() => import("./components/pages/AdminLeitura"));
 
 const carregandoPagina = (
   <main className="fc-main fc-main--simples">
@@ -44,6 +46,7 @@ export default function App() {
           {/* Entrar e cadastro: telas próprias, sem cabeçalho e rodapé */}
           <Route path="/entrar" element={<Entrar />} />
           <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/contas" element={<Contas />} />
 
           <Route element={<Layout />}>
             {/* Públicas: ninguém precisa entrar para ler */}
@@ -56,6 +59,7 @@ export default function App() {
             <Route path="/admin" element={<RotaProtegida permissao="admin:acessar"><AdminPainel /></RotaProtegida>} />
             <Route path="/admin/artigos" element={<RotaProtegida permissao="artigos:gerenciar"><AdminArtigos /></RotaProtegida>} />
             <Route path="/admin/usuarios" element={<RotaProtegida permissao="usuarios:gerenciar"><AdminUsuarios /></RotaProtegida>} />
+            <Route path="/admin/leitura" element={<RotaProtegida permissao="artigos:gerenciar"><Suspense fallback={carregandoPagina}><AdminLeitura /></Suspense></RotaProtegida>} />
             <Route path="/admin/desempenho" element={<RotaProtegida permissao="desempenho:ver"><Suspense fallback={carregandoPagina}><AdminDesempenho /></Suspense></RotaProtegida>} />
             <Route path="/editor" element={<RotaProtegida permissao="artigos:gerenciar"><Editor /></RotaProtegida>} />
             <Route path="/rascunhos" element={<RotaProtegida permissao="artigos:gerenciar"><Rascunhos /></RotaProtegida>} />
