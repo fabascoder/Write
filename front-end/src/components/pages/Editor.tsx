@@ -39,7 +39,7 @@ export default function Editor() {
   const [params] = useSearchParams();
   // ?id=  → editando um artigo publicado | ?rascunho= → continuando um rascunho
   const idEdicao = params.get("id");
-  const { artigos, carregando } = useArtigos();
+  const { artigos, carregando } = useArtigos({ id: idEdicao, daRede: true });
   const artigoEditado = idEdicao ? artigos.find((a) => String(a.id) === idEdicao) : undefined;
 
   const rascunhoInicial = useMemo(() => {

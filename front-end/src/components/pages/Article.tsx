@@ -16,7 +16,7 @@ import Reacoes from "../artigo/Reacoes";
 export default function Article() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { artigos, carregando, erro } = useArtigos();
+  const { artigos, carregando, erro } = useArtigos({ id });
   const { pode } = useAuth();
   const logado = pode("artigos:gerenciar");
 

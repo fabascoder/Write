@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -14,7 +15,10 @@ export default function Layout() {
     <div className="fc-page">
       <div className="fc-container">
         <Header simples={cabecalhoSimples} />
-        <Outlet />
+        {/* Páginas baixadas sob demanda (ver App.tsx): o cabeçalho fica parado enquanto chegam */}
+        <Suspense fallback={<main className="fc-main fc-main--simples"><p className="fc-estado">Carregando…</p></main>}>
+          <Outlet />
+        </Suspense>
         {!semRodape && <Footer />}
       </div>
 

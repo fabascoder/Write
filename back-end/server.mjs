@@ -62,8 +62,9 @@ function medirRequisicao(req, res) {
   };
 
   res.on("finish", () => {
-    // As próprias métricas não entram na conta
-    if (req.method === "OPTIONS" || req.rota?.startsWith("/metricas") || req.rota === "/atividade" || req.rota === "/leituras") return;
+    // As próprias métricas não entram na conta, nem o "/" (é o que o serviço que
+    // mantém a API acordada chama a cada poucos minutos; ver README)
+    if (req.method === "OPTIONS" || req.rota === "/" || req.rota?.startsWith("/metricas") || req.rota === "/atividade" || req.rota === "/leituras") return;
     registrarMetrica({
       origem: "servidor",
       acao: "api",

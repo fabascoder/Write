@@ -22,14 +22,13 @@ export async function descarregar() {
   if (lote.length === 0) return;
 
   try {
-    for (const m of lote) {
-      await db.query(
-        `
-          INSERT INTO metricas
-            (origem, acao, rota, metodo, status, "duracaoMs", "servidorMs", bytes, detalhes, "dataCriacao")
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        `,
-        [
+    // Um INSERT com várias linhas: uma ida ao banco por lote, não uma por métrica
+    for (let i = 0; i < lote.length; i += 50) {
+      const pedaco = lote.slice(i, i + 50);
+      const valores = [];
+      const linhas = pedaco.map((m) => {
+        const base = valores.length;
+        valores.push(
           m.origem,
           m.acao,
           m.rota ?? null,
@@ -40,7 +39,16 @@ export async function descarregar() {
           m.bytes ?? null,
           m.detalhes ? JSON.stringify(m.detalhes) : null,
           m.dataCriacao,
-        ],
+        );
+        return `(${Array.from({ length: 10 }, (_, j) => `$${base + j + 1}`).join(", ")})`;
+      });
+      await db.query(
+        `
+          INSERT INTO metricas
+            (origem, acao, rota, metodo, status, "duracaoMs", "servidorMs", bytes, detalhes, "dataCriacao")
+          VALUES ${linhas.join(", ")}
+        `,
+        valores,
       );
     }
 

@@ -5,6 +5,15 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <!-- Começa a buscar os artigos já, em paralelo com o download do JavaScript do site,
+         e de quebra acorda a API no Render (ela dorme quando fica parada). Fica antes
+         das fontes porque um script depois de um CSS espera o CSS chegar. Ver lib/api.ts. -->
+    <script>
+      window.__artigos = fetch("/api/documentos")
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    </script>
+
     <!-- Poppins: marca e títulos / Inter: textos e interface -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

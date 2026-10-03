@@ -142,6 +142,14 @@ Ler é livre: artigos, compartilhamento e a página `/embed` não pedem login. A
 - **Foto de perfil:** em `/perfil`, clicar na foto (ou em "Adicionar foto") escolhe uma imagem. O navegador recorta um quadrado no centro e reduz para 320×320 antes de enviar (~5–40 KB). A foto fica no banco, na tabela `fotosPerfil`, porque o disco do Render é apagado a cada deploy. A API confere o tipo e os bytes da imagem; SVG não é aceito.
 - **Segurança:** senha com hash `scrypt`, limite de tentativas de login, token recusado se for alterado, vencido ou assinado com outra chave. O React só esconde botões; quem bloqueia é a API (401 sem login, 403 sem permissão).
 
+## Desempenho
+
+- **Código sob demanda:** quem só lê baixa a home e o artigo (~85 KB de JS com gzip). Editor (Quill), gráficos (Recharts), login, perfil e o painel do admin são baixados só quando a página é aberta (`React.lazy` no `App.tsx`).
+- **Artigos em cache** (`lib/api.ts`): o `index.html` começa a buscar `/api/documentos` antes do JavaScript chegar. A lista fica em memória (trocar de página não refaz a requisição por 1 minuto) e no `localStorage`, então quem volta ao site vê os artigos na hora, mesmo com a API acordando. Publicar, editar ou excluir limpa o cache. O editor sempre busca da rede.
+- **Arquivos do site** (`/assets/*`, com hash no nome) ficam em cache por 1 ano (`vercel.json`). Fotos de perfil também, com `?v=` no endereço.
+- **Métricas** são gravadas em lote, com um `INSERT` só.
+- **API dormindo (Render gratuito):** depois de ~15 minutos parada, a primeira requisição demora 20–50 s. Para evitar, cadastre `https://writeapi.onrender.com/` num serviço de monitoramento gratuito (UptimeRobot ou cron-job.org) chamando a cada 10 minutos, ou use um plano pago do Render. As chamadas ao `/` não entram no painel de desempenho.
+
 ## API
 
 | Método | Rota | Acesso | O que faz |
