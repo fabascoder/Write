@@ -1,13 +1,11 @@
 import { createContext } from "react";
 import type { Cadastro, Usuario } from "../lib/autenticacao";
 
-export type ModoLogin = "entrar" | "cadastro";
-
 export type PedidoLogin = {
-  modo: ModoLogin;
+  modo?: "entrar" | "cadastro";
   /** Ex.: "Você precisa estar conectado para curtir este artigo." */
   motivo?: string;
-  /** Página para onde voltar depois do login com Google */
+  /** Página para onde voltar depois de entrar. Sem ela, vai para a página principal */
   voltar?: string;
 };
 
@@ -26,14 +24,13 @@ export type ValorAuth = {
   /** Só para mostrar/esconder na tela. Quem protege de verdade é o back-end */
   pode: (permissao: string) => boolean;
 
-  /** Modal de login/cadastro */
-  pedido: PedidoLogin | null;
-  abrirLogin: (pedido?: Partial<PedidoLogin>) => void;
-  fecharLogin: () => void;
+  /** Leva para /entrar (ou /cadastro) */
+  abrirLogin: (pedido?: PedidoLogin) => void;
 
   /**
-   * Para ações que precisam de conta. Logado: executa. Visitante: abre o login
-   * com o motivo. Ex.: exigirLogin("curtir este artigo", curtir)
+   * Para ações que precisam de conta. Logado: executa. Visitante: vai para o
+   * login com o motivo e volta para a mesma página depois.
+   * Ex.: exigirLogin("curtir este artigo", curtir)
    */
   exigirLogin: (acao: string, executar: () => void) => void;
 };

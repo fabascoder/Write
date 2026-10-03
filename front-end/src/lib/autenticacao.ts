@@ -85,3 +85,52 @@ export async function mudarRole(id: number, role: Role) {
   });
   return data.usuario;
 }
+
+// ---------- Validação dos formulários ----------
+// O back-end confere tudo de novo; aqui é só para avisar antes de enviar.
+
+export type ErrosForm = Partial<Record<"nome" | "email" | "senha" | "confirmacao" | "geral", string>>;
+
+const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function validarLogin(email: string, senha: string): ErrosForm {
+  const erros: ErrosForm = {};
+  if (!email.trim()) erros.email = "Digite seu e-mail.";
+  else if (!EMAIL_VALIDO.test(email.trim())) erros.email = "Digite um e-mail válido.";
+  if (!senha) erros.senha = "Digite sua senha.";
+  return erros;
+}
+
+export function validarCadastro(dados: Cadastro): ErrosForm {
+  const erros: ErrosForm = {};
+  const nome = dados.nome.trim();
+
+  if (!nome) erros.nome = "Digite seu nome.";
+  else if (nome.length < 2) erros.nome = "O nome precisa ter pelo menos 2 letras.";
+  else if (nome.length > 80) erros.nome = "O nome pode ter no máximo 80 caracteres.";
+
+  if (!dados.email.trim()) erros.email = "Digite seu e-mail.";
+  else if (!EMAIL_VALIDO.test(dados.email.trim())) erros.email = "Digite um e-mail válido.";
+
+  if (!dados.senha) erros.senha = "Crie uma senha.";
+  else if (dados.senha.length < SENHA_MINIMA) erros.senha = `A senha precisa ter pelo menos ${SENHA_MINIMA} caracteres.`;
+
+  if (!dados.confirmacao) erros.confirmacao = "Confirme sua senha.";
+  else if (dados.confirmacao !== dados.senha) erros.confirmacao = "As senhas não são iguais.";
+
+  return erros;
+}
+
+export const temErros = (erros: ErrosForm) => Object.values(erros).some(Boolean);
+
+// ---------- Endereços das telas de login ----------
+
+// Só caminhos do próprio site ("/artigo/2"), nunca outro endereço
+export function caminhoSeguro(caminho: string | null | undefined) {
+  return caminho && /^\/(?!\/)/.test(caminho) ? caminho : "";
+}
+
+// Mantém o ?voltar= ao trocar entre entrar e cadastro
+export function comVoltar(caminho: string, voltar?: string) {
+  return voltar ? `${caminho}?voltar=${encodeURIComponent(voltar)}` : caminho;
+}

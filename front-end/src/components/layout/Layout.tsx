@@ -1,8 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
-import { AuthProvider } from "../../context/AuthProvider";
 import Header from "./Header";
 import Footer from "./Footer";
-import LoginModal from "./LoginModal";
 import SocialRail from "./SocialRail";
 
 export default function Layout() {
@@ -13,17 +11,14 @@ export default function Layout() {
   const cabecalhoSimples = pathname.startsWith("/editor");
 
   return (
-    <AuthProvider>
-      <div className="fc-page">
-        <div className="fc-container">
-          <Header simples={cabecalhoSimples} />
-          <Outlet />
-          {!semRodape && <Footer />}
-        </div>
-
-        <SocialRail />
-        <LoginModal />
+    <div className="fc-page">
+      <div className="fc-container">
+        <Header simples={cabecalhoSimples} />
+        <Outlet />
+        {!semRodape && <Footer />}
       </div>
-    </AuthProvider>
+
+      <SocialRail />
+    </div>
   );
 }

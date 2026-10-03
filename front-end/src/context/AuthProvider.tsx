@@ -1,15 +1,17 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 import * as api from "../lib/autenticacao";
 import type { Cadastro, Usuario } from "../lib/autenticacao";
 import { AuthContext, type PedidoLogin, type ValorAuth } from "./auth";
 
-// Guarda quem está logado e abre o modal de login quando alguma ação precisa de conta.
+// Guarda quem está logado. O login em si é um JWT num cookie httpOnly:
+// este código nunca vê nem guarda o token, só pergunta ao back-end quem é.
 // Ninguém precisa estar logado para ler: visitantes só têm usuario = null.
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [google, setGoogle] = useState(false);
-  const [pedido, setPedido] = useState<PedidoLogin | null>(null);
 
   useEffect(() => {
     let ativo = true;
@@ -51,8 +53,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const pode = useCallback((permissao: string) => Boolean(usuario?.permissoes.includes(permissao)), [usuario]);
 
-  const abrirLogin = useCallback((p: Partial<PedidoLogin> = {}) => setPedido({ modo: "entrar", ...p }), []);
-  const fecharLogin = useCallback(() => setPedido(null), []);
+  const abrirLogin = useCallback(
+    ({ modo = "entrar", motivo, voltar }: PedidoLogin = {}) => {
+      const caminho = modo === "cadastro" ? "/cadastro" : "/entrar";
+      navigate(api.comVoltar(caminho, api.caminhoSeguro(voltar)), { state: motivo ? { motivo } : null });
+    },
+    [navigate],
+  );
 
   const exigirLogin = useCallback(
     (acao: string, executar: () => void) => {
@@ -60,13 +67,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         executar();
         return;
       }
-      setPedido({
-        modo: "entrar",
+      abrirLogin({
         motivo: `Você precisa estar conectado para ${acao}.`,
         voltar: window.location.pathname + window.location.search,
       });
     },
-    [usuario],
+    [usuario, abrirLogin],
   );
 
   const valor = useMemo<ValorAuth>(
@@ -79,12 +85,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sair,
       atualizarUsuario: setUsuario,
       pode,
-      pedido,
       abrirLogin,
-      fecharLogin,
       exigirLogin,
     }),
-    [usuario, carregando, google, entrar, cadastrar, sair, pode, pedido, abrirLogin, fecharLogin, exigirLogin],
+    [usuario, carregando, google, entrar, cadastrar, sair, pode, abrirLogin, exigirLogin],
   );
 
   return <AuthContext.Provider value={valor}>{children}</AuthContext.Provider>;

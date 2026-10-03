@@ -69,15 +69,7 @@ const POSTGRES = /*sql*/ `
     UNIQUE (provedor, "provedorId")
   );
 
-  -- Sessões de login. Guarda só o hash do token, nunca o token em si
-  CREATE TABLE IF NOT EXISTS sessoes (
-    id SERIAL PRIMARY KEY,
-    "usuarioId" INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
-    "tokenHash" TEXT NOT NULL UNIQUE,
-    "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "expiraEm" TIMESTAMPTZ NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS sessoes_usuario ON sessoes ("usuarioId");
+  -- O login usa JWT (auth/jwt.mjs): não precisa de tabela de sessões
 `;
 
 const SQLITE = /*sql*/ `
@@ -110,14 +102,6 @@ const SQLITE = /*sql*/ `
     UNIQUE (provedor, provedorId)
   );
 
-  CREATE TABLE IF NOT EXISTS sessoes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    usuarioId INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
-    tokenHash TEXT NOT NULL UNIQUE,
-    dataCriacao TEXT NOT NULL DEFAULT (datetime('now')),
-    expiraEm TEXT NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS sessoes_usuario ON sessoes (usuarioId);
 `;
 
 export async function inicializarBanco() {

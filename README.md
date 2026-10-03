@@ -123,6 +123,7 @@ Se a conta já existe (criada pelo site ou pelo Google), ela vira administradora
 |---|---|---|
 | `back-end/.env` | `DATABASE_URL` | Conexão com o PostgreSQL. Sem ela, usa SQLite local. |
 | `back-end/.env` | `PORT` | Porta do servidor. O padrão é `3000`. |
+| `back-end/.env` | `JWT_SECRET` | Chave que assina os tokens de login (JWT). **Obrigatória em produção**; sem ela, todos são deslogados quando o servidor reinicia. |
 | `back-end/.env` | `APP_URL` | Endereço público do front (em produção, `https://write-w.vercel.app`). Define a volta do login com Google e liga o cookie `Secure`. |
 | `back-end/.env` | `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` | Login com Google (opcional). Sem eles, o botão não aparece. |
 | `front-end/.env` | `VITE_API_URL` | Opcional. Força outro endereço de API, mas aí o login não funciona. |
@@ -136,7 +137,8 @@ Ler é livre: artigos, compartilhamento e a página `/embed` não pedem login. A
 - **Um login só** para todo mundo, com e-mail e senha ou com Google. Uma pessoa que já tem conta e entra com o Google do mesmo e-mail continua na mesma conta.
 - **Roles:** `leitor` (padrão de quem se cadastra), `funcionario` e `admin`. O cadastro nunca escolhe a role.
 - **Permissões:** as rotas conferem permissões (`artigos:gerenciar`, `usuarios:gerenciar`…), definidas em `back-end/auth/permissoes.mjs`. Para dar poderes ao funcionário, é só acrescentar na lista dele.
-- **Segurança:** senha com hash `scrypt`, sessão em cookie `httpOnly` + `SameSite=Lax` (guardada no banco só como hash), limite de tentativas de login. O React só esconde botões; quem bloqueia é a API (401 sem login, 403 sem permissão).
+- **Login com JWT:** token HS256 válido por 7 dias, num cookie `httpOnly` + `SameSite=Lax`. A API também aceita `Authorization: Bearer <token>`. A cada requisição o usuário é buscado no banco, então a role vale sempre a atual.
+- **Segurança:** senha com hash `scrypt`, limite de tentativas de login, token recusado se for alterado, vencido ou assinado com outra chave. O React só esconde botões; quem bloqueia é a API (401 sem login, 403 sem permissão).
 
 ## API
 
@@ -147,9 +149,9 @@ Ler é livre: artigos, compartilhamento e a página `/embed` não pedem login. A
 | `POST` | `/publicar` | `artigos:gerenciar` | Publica um novo artigo |
 | `PUT` | `/documentos/:id` | `artigos:gerenciar` | Edita um artigo publicado |
 | `DELETE` | `/documentos/:id` | `artigos:gerenciar` | Apaga um artigo publicado |
-| `POST` | `/auth/cadastro` | público | Cria conta de leitor e já entra |
-| `POST` | `/auth/login` | público | Entra com e-mail e senha |
-| `POST` | `/auth/logout` | público | Encerra a sessão |
+| `POST` | `/auth/cadastro` | público | Cria conta de leitor e já entra (devolve o JWT) |
+| `POST` | `/auth/login` | público | Entra com e-mail e senha (devolve o JWT) |
+| `POST` | `/auth/logout` | público | Apaga o cookie do token |
 | `GET` | `/auth/eu` | público | Quem está logado (ou `null`) |
 | `PATCH` | `/auth/eu` | logado | Muda o nome |
 | `GET` | `/auth/google` | público | Começa o login com Google |

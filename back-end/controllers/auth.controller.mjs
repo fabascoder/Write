@@ -3,9 +3,21 @@ import { ehErroDeDuplicado } from "../database/database.mjs";
 import { ipDe, lerCookies, lerJson, lerQuery, redirecionar, responder } from "../http.mjs";
 import { APP_URL, googleConfigurado } from "../auth/config.mjs";
 import { contaGoogle, urlDeAutorizacao } from "../auth/google.mjs";
-import { permissoesDe, pode } from "../auth/permissoes.mjs";
+import { permissoesDe } from "../auth/permissoes.mjs";
 import { conferirSenha, conferirSenhaFalsa, gerarHashSenha } from "../auth/senha.mjs";
 import { cookieApagado, criarSessao, encerrarSessao, montarCookie, usuarioDaSessao } from "../auth/sessao.mjs";
+
+// Resposta de login/cadastro: o JWT vai no cookie httpOnly (o que o site usa) e
+// também no corpo, para quem testar a API direto (Authorization: Bearer).
+async function responderComSessao(res, status, usuario, extra = {}) {
+  const sessao = criarSessao(usuario);
+  responder(
+    res,
+    status,
+    { ...extra, usuario: await resumoDoUsuario(usuario), token: sessao.token, expiraEm: sessao.expiraEm },
+    [sessao.cookie],
+  );
+}
 import * as usuarios from "../services/usuario.service.mjs";
 
 // ---------- Validação ----------
@@ -88,8 +100,7 @@ export async function cadastrar(req, res) {
       throw error;
     }
 
-    const cookie = await criarSessao(usuario.id);
-    responder(res, 201, { mensagem: "Conta criada.", usuario: await resumoDoUsuario(usuario) }, [cookie]);
+    await responderComSessao(res, 201, usuario, { mensagem: "Conta criada." });
   } catch (error) {
     console.error("Erro no cadastro:", error);
     responder(res, 500, { mensagem: "Não foi possível criar a conta agora." });
@@ -125,8 +136,7 @@ export async function entrar(req, res) {
     }
 
     falhas.delete(ip);
-    const cookie = await criarSessao(usuario.id);
-    responder(res, 200, { usuario: await resumoDoUsuario(usuario) }, [cookie]);
+    await responderComSessao(res, 200, usuario);
   } catch (error) {
     console.error("Erro no login:", error);
     responder(res, 500, { mensagem: "Não foi possível entrar agora." });
@@ -136,8 +146,7 @@ export async function entrar(req, res) {
 // POST /auth/logout
 export async function sair(req, res) {
   try {
-    const cookie = await encerrarSessao(req);
-    responder(res, 200, { mensagem: "Até logo." }, [cookie]);
+    responder(res, 200, { mensagem: "Até logo." }, [encerrarSessao()]);
   } catch (error) {
     console.error("Erro ao sair:", error);
     responder(res, 500, { mensagem: "Não foi possível sair agora." });
@@ -231,8 +240,9 @@ export async function googleCallback(req, res) {
       await usuarios.vincularProvedor(usuario.id, "google", google.id);
     }
 
-    const cookie = await criarSessao(usuario.id);
-    const destino = caminhoSeguro(salvo.voltar) || (pode(usuario, "admin:acessar") ? "/admin" : "/perfil");
+    // Deu tudo certo: volta para onde estava, ou para a página principal
+    const { cookie } = criarSessao(usuario);
+    const destino = caminhoSeguro(salvo.voltar) || "/";
     redirecionar(res, `${APP_URL}${destino}`, [cookie, limpar]);
   } catch (error) {
     console.error("Erro no login com Google:", error);

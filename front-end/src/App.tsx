@@ -1,4 +1,5 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./context/AuthProvider";
 import Layout from "./components/layout/Layout";
 import Home from "./components/pages/Home";
 import Article from "./components/pages/Article";
@@ -6,11 +7,21 @@ import Editor from "./components/pages/Editor";
 import Rascunhos from "./components/pages/Rascunhos";
 import Embed from "./components/pages/Embed";
 import Entrar from "./components/pages/Entrar";
+import Cadastro from "./components/pages/Cadastro";
 import Perfil from "./components/pages/Perfil";
 import AdminPainel from "./components/pages/AdminPainel";
 import AdminArtigos from "./components/pages/AdminArtigos";
 import AdminUsuarios from "./components/pages/AdminUsuarios";
 import RotaProtegida from "./components/auth/RotaProtegida";
+
+// A sessão vale para o site todo (menos o /embed, que é só um cartão público)
+function ComSessao() {
+  return (
+    <AuthProvider>
+      <Outlet />
+    </AuthProvider>
+  );
+}
 
 export default function App() {
   return (
@@ -19,28 +30,31 @@ export default function App() {
         {/* Cartão personalizado do compartilhamento, fora do layout do site */}
         <Route path="/embed/artigo/:id" element={<Embed />} />
 
-        <Route element={<Layout />}>
-          {/* Públicas: ninguém precisa entrar para ler */}
-          <Route path="/" element={<Home />} />
-          <Route path="/artigo/:id" element={<Article />} />
+        <Route element={<ComSessao />}>
+          {/* Entrar e cadastro: telas próprias, sem cabeçalho e rodapé */}
+          <Route path="/entrar" element={<Entrar />} />
+          <Route path="/cadastro" element={<Cadastro />} />
 
-          {/* Conta */}
-          <Route path="/entrar" element={<Entrar modo="entrar" />} />
-          <Route path="/cadastro" element={<Entrar modo="cadastro" />} />
-          <Route path="/perfil" element={<RotaProtegida><Perfil /></RotaProtegida>} />
+          <Route element={<Layout />}>
+            {/* Públicas: ninguém precisa entrar para ler */}
+            <Route path="/" element={<Home />} />
+            <Route path="/artigo/:id" element={<Article />} />
 
-          {/* Administração: o React esconde, a API bloqueia de verdade */}
-          <Route path="/admin" element={<RotaProtegida permissao="admin:acessar"><AdminPainel /></RotaProtegida>} />
-          <Route path="/admin/artigos" element={<RotaProtegida permissao="artigos:gerenciar"><AdminArtigos /></RotaProtegida>} />
-          <Route path="/admin/usuarios" element={<RotaProtegida permissao="usuarios:gerenciar"><AdminUsuarios /></RotaProtegida>} />
-          <Route path="/editor" element={<RotaProtegida permissao="artigos:gerenciar"><Editor /></RotaProtegida>} />
-          <Route path="/rascunhos" element={<RotaProtegida permissao="artigos:gerenciar"><Rascunhos /></RotaProtegida>} />
+            <Route path="/perfil" element={<RotaProtegida><Perfil /></RotaProtegida>} />
 
-          {/* rotas antigas continuam funcionando */}
-          <Route path="/article/:id" element={<Article />} />
-          <Route path="/login" element={<Navigate to="/entrar" replace />} />
-          <Route path="/meus-artigos" element={<Navigate to="/admin/artigos" replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Administração: o React esconde, a API bloqueia de verdade */}
+            <Route path="/admin" element={<RotaProtegida permissao="admin:acessar"><AdminPainel /></RotaProtegida>} />
+            <Route path="/admin/artigos" element={<RotaProtegida permissao="artigos:gerenciar"><AdminArtigos /></RotaProtegida>} />
+            <Route path="/admin/usuarios" element={<RotaProtegida permissao="usuarios:gerenciar"><AdminUsuarios /></RotaProtegida>} />
+            <Route path="/editor" element={<RotaProtegida permissao="artigos:gerenciar"><Editor /></RotaProtegida>} />
+            <Route path="/rascunhos" element={<RotaProtegida permissao="artigos:gerenciar"><Rascunhos /></RotaProtegida>} />
+
+            {/* rotas antigas continuam funcionando */}
+            <Route path="/article/:id" element={<Article />} />
+            <Route path="/login" element={<Navigate to="/entrar" replace />} />
+            <Route path="/meus-artigos" element={<Navigate to="/admin/artigos" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
