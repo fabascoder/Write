@@ -149,6 +149,8 @@ Ler é livre: artigos, compartilhamento e a página `/embed` não pedem login. A
 | `POST` | `/publicar` | `artigos:gerenciar` | Publica um novo artigo |
 | `PUT` | `/documentos/:id` | `artigos:gerenciar` | Edita um artigo publicado |
 | `DELETE` | `/documentos/:id` | `artigos:gerenciar` | Apaga um artigo publicado |
+| `GET` | `/documentos/:id/reacoes` | público | Total de likes e deslikes (e a reação de quem está logado) |
+| `PUT` | `/documentos/:id/reacao` | logado | Like (`1`), deslike (`-1`) ou tirar a reação (`0`) |
 | `POST` | `/auth/cadastro` | público | Cria conta de leitor e já entra (devolve o JWT) |
 | `POST` | `/auth/login` | público | Entra com e-mail e senha (devolve o JWT) |
 | `POST` | `/auth/logout` | público | Apaga o cookie do token |
@@ -175,7 +177,8 @@ Ler é livre: artigos, compartilhamento e a página `/embed` não pedem login. A
 - [ ] Salvar categoria e tags no banco
 - [x] Contas, login (e-mail e Google) e permissões na API
 - [ ] Ligar artigos ao autor (`autorId` em `documentos`)
-- [ ] Curtidas, comentários, favoritos e notificações
+- [x] Like e deslike nos artigos
+- [ ] Comentários, favoritos e notificações
 - [ ] Buscar um artigo por `id` direto na API
 - [ ] Rascunhos salvos no servidor, e não só no navegador
 - [ ] Imagem de capa nos artigos

@@ -4,6 +4,7 @@ import { inicializarBanco } from "./database/database.mjs";
 import editorTextoRoutes from "./routes/editorTexto.route.mjs";
 import authRoutes from "./routes/auth.route.mjs";
 import usuarioRoutes from "./routes/usuario.route.mjs";
+import reacaoRoutes from "./routes/reacao.route.mjs";
 
 const router = new Router();
 
@@ -28,6 +29,9 @@ authRoutes(router);
 
 // Gerenciamento de usuários (admin)
 usuarioRoutes(router);
+
+// Like e deslike nos artigos
+reacaoRoutes(router);
 
 // Criação do servidor
 const server = createServer(async (req, res) => {

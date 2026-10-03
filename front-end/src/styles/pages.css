@@ -347,3 +347,86 @@
 }
 .fc-usuarios-role { width: min(200px, 100%); }
 .fc-usuarios-role select:disabled { border-color: var(--linha); background: var(--cinza); }
+
+/* ---------- Like e deslike (fim do artigo) ---------- */
+.fc-reacoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 20px;
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--linha-2);
+}
+.fc-reacoes-pergunta {
+  font-family: var(--titulo);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--tinta-2);
+}
+.fc-reacoes-botoes { display: flex; gap: 10px; }
+
+.fc-reacao {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 16px 0 14px;
+  border: 1.5px solid var(--linha);
+  border-radius: 999px;
+  background: var(--branco);
+  font-family: var(--titulo);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tinta-2);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: border-color 0.2s var(--suave), background 0.2s var(--suave),
+    color 0.2s var(--suave), transform 0.15s var(--suave);
+}
+.fc-reacao svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.25s var(--suave);
+}
+.fc-reacao:hover { border-color: var(--azul); color: var(--azul); }
+.fc-reacao:active { transform: translateY(1px); }
+.fc-reacao:disabled { opacity: 0.55; cursor: progress; }
+
+/* Marcado: like em azul, deslike em escuro, com o ícone preenchido */
+.fc-reacao[aria-pressed="true"] svg { fill: currentColor; fill-opacity: 0.2; }
+.fc-reacao--like[aria-pressed="true"] {
+  border-color: var(--azul);
+  background: var(--azul-claro);
+  color: var(--azul);
+}
+.fc-reacao--like[aria-pressed="true"] svg { transform: rotate(-8deg) scale(1.08); }
+.fc-reacao--dislike[aria-pressed="true"] {
+  border-color: var(--tinta);
+  background: var(--cinza);
+  color: var(--tinta);
+}
+
+/* Convite para entrar (visitantes) ou aviso quando as curtidas estão fora do ar */
+.fc-reacoes-aviso {
+  flex-basis: 100%;
+  margin-top: -4px;
+  font-size: 14px;
+  text-align: right;
+  color: var(--tinta-3);
+}
+.fc-reacoes-aviso button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 600;
+  color: var(--azul);
+  cursor: pointer;
+}
+.fc-reacoes-aviso button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.fc-reacao:disabled { cursor: not-allowed; }
+
+@media (max-width: 480px) {
+  .fc-reacoes-aviso { text-align: left; }
+}

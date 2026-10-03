@@ -249,3 +249,20 @@ export const EyeOffIcon = () => (
     <path d="m3 3 18 18" />
   </Icon>
 );
+
+// Joinha (like) e o mesmo virado para baixo (deslike)
+export const ThumbUpIcon = () => (
+  <Icon>
+    <path d="M7 10.5V20H4.5a1.5 1.5 0 0 1-1.5-1.5V12a1.5 1.5 0 0 1 1.5-1.5H7Z" />
+    <path d="M7 10.5 10.8 3.6A2.3 2.3 0 0 1 14 5.6V9h5a2 2 0 0 1 2 2.3l-1.1 6.9A2.2 2.2 0 0 1 17.7 20H7" />
+  </Icon>
+);
+
+export const ThumbDownIcon = () => (
+  <Icon>
+    <g transform="rotate(180 12 12)">
+      <path d="M7 10.5V20H4.5a1.5 1.5 0 0 1-1.5-1.5V12a1.5 1.5 0 0 1 1.5-1.5H7Z" />
+      <path d="M7 10.5 10.8 3.6A2.3 2.3 0 0 1 14 5.6V9h5a2 2 0 0 1 2 2.3l-1.1 6.9A2.2 2.2 0 0 1 17.7 20H7" />
+    </g>
+  </Icon>
+);

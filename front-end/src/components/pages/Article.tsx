@@ -8,6 +8,7 @@ import { ArrowLeftIcon, PenIcon, TrashIcon } from "../icons";
 import ConfirmDialog from "../layout/ConfirmDialog";
 import { Head } from "../layout/Head";
 import OptionsMenu from "../layout/OptionsMenu";
+import Reacoes from "../artigo/Reacoes";
 
 export default function Article() {
   const { id } = useParams();
@@ -117,6 +118,8 @@ export default function Article() {
         </div>
 
         <div className="fc-prosa" dangerouslySetInnerHTML={{ __html: htmlLegivel(artigo.conteudoHtml) }} />
+
+        <Reacoes artigoId={artigo.id} />
       </article>
 
       <ConfirmDialog

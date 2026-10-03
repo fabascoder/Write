@@ -70,10 +70,27 @@ const POSTGRES = /*sql*/ `
   );
 
   -- O login usa JWT (auth/jwt.mjs): não precisa de tabela de sessões
+
+  -- Like (1) e deslike (-1) nos artigos. Uma reação por pessoa por artigo.
+  -- Apagar o artigo ou a conta apaga as reações junto.
+  CREATE TABLE IF NOT EXISTS reacoes (
+    id SERIAL PRIMARY KEY,
+    "usuarioId" INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    "documentoId" INTEGER NOT NULL REFERENCES documentos(id) ON DELETE CASCADE,
+    valor SMALLINT NOT NULL CHECK (valor IN (1, -1)),
+    "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "dataAtualizacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE ("usuarioId", "documentoId")
+  );
+  CREATE INDEX IF NOT EXISTS reacoes_documento ON reacoes ("documentoId");
 `;
 
 const SQLITE = /*sql*/ `
   PRAGMA foreign_keys = ON;
+
+  -- Se outro programa estiver com o banco.db aberto (antivírus, visualizador de
+  -- SQLite...), espera até 5s pela vez em vez de falhar com "database is locked"
+  PRAGMA busy_timeout = 5000;
 
   CREATE TABLE IF NOT EXISTS documentos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -102,6 +119,16 @@ const SQLITE = /*sql*/ `
     UNIQUE (provedor, provedorId)
   );
 
+  CREATE TABLE IF NOT EXISTS reacoes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuarioId INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    documentoId INTEGER NOT NULL REFERENCES documentos(id) ON DELETE CASCADE,
+    valor INTEGER NOT NULL CHECK (valor IN (1, -1)),
+    dataCriacao TEXT NOT NULL DEFAULT (datetime('now')),
+    dataAtualizacao TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (usuarioId, documentoId)
+  );
+  CREATE INDEX IF NOT EXISTS reacoes_documento ON reacoes (documentoId);
 `;
 
 export async function inicializarBanco() {
