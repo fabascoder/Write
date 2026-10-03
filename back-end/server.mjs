@@ -2,6 +2,8 @@ import { createServer } from "node:http";
 import { Router } from "./router.mjs";
 import { inicializarBanco } from "./database/database.mjs";
 import editorTextoRoutes from "./routes/editorTexto.route.mjs";
+import authRoutes from "./routes/auth.route.mjs";
+import usuarioRoutes from "./routes/usuario.route.mjs";
 
 const router = new Router();
 
@@ -21,6 +23,12 @@ router.get("/", (req, res) => {
 // Rotas dos artigos
 editorTextoRoutes(router);
 
+// Contas, login e sessão
+authRoutes(router);
+
+// Gerenciamento de usuários (admin)
+usuarioRoutes(router);
+
 // Criação do servidor
 const server = createServer(async (req, res) => {
   // Configuração do CORS
@@ -28,7 +36,7 @@ const server = createServer(async (req, res) => {
 
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, DELETE",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE",
   );
 
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");

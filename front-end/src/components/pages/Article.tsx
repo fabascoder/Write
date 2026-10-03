@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useArtigos } from "../../hooks/useArtigos";
-import { useAdmin } from "../../hooks/useAdmin";
+import { useAuth } from "../../hooks/useAuth";
 import { excluirArtigo } from "../../lib/api";
 import { dataPorExtenso, htmlLegivel, resumo, tempoRelativo } from "../../lib/format";
 import { ArrowLeftIcon, PenIcon, TrashIcon } from "../icons";
@@ -13,7 +13,8 @@ export default function Article() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { artigos, carregando, erro } = useArtigos();
-  const { logado } = useAdmin();
+  const { pode } = useAuth();
+  const logado = pode("artigos:gerenciar");
 
   const [confirmando, setConfirmando] = useState(false);
   const [excluindo, setExcluindo] = useState(false);

@@ -971,3 +971,100 @@ html.fc-embed body { background: transparent; }
   background: var(--azul);
 }
 .fc-opcoes-botao { position: relative; }
+
+/* ---------- Entrar / criar conta ---------- */
+.fc-auth-google {
+  width: 100%;
+  height: 44px;
+  border-color: var(--linha);
+  color: var(--tinta);
+}
+.fc-auth-google:hover { border-color: var(--azul); background: var(--azul-claro); }
+.fc-auth-google svg { width: 18px; height: 18px; }
+
+/* "ou" entre o Google e o formulário */
+.fc-auth-ou {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  font-size: 13px;
+  color: var(--tinta-3);
+}
+.fc-auth-ou::before,
+.fc-auth-ou::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--linha-2);
+}
+
+.fc-form .fc-btn:disabled { opacity: 0.65; cursor: progress; }
+
+.fc-auth-troca {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--tinta-3);
+}
+.fc-auth-troca button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-weight: 600;
+  color: var(--azul);
+  cursor: pointer;
+}
+.fc-auth-troca button:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* /entrar, /cadastro e "Acesso negado": a mesma caixa do modal, no meio da página */
+.fc-auth-pagina {
+  display: grid;
+  place-items: start center;
+}
+.fc-auth-caixa {
+  margin-top: clamp(8px, 4vw, 40px);
+  border: 1px solid var(--linha-2);
+  box-shadow: 0 20px 50px rgba(16, 21, 28, 0.08);
+}
+
+/* Aviso no lugar de uma função que exige conta */
+.fc-precisa-entrar {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+  text-align: center;
+}
+.fc-precisa-entrar p { color: var(--tinta-2); }
+.fc-precisa-entrar div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- Menu da conta (rodapé) ---------- */
+.fc-usuario-botao svg { transition: none; }
+.fc-usuario-botao:hover svg { transform: none; }
+
+/* Balão abrindo para cima, porque o botão fica no rodapé */
+.fc-opcoes-menu--cima {
+  top: auto;
+  bottom: calc(100% + 12px);
+}
+.fc-opcoes-menu--cima::before {
+  top: auto;
+  bottom: -7px;
+}
+.fc-opcoes-item[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: default;
+}
+.fc-opcoes-item[aria-disabled="true"]:hover { background: none; }
+.fc-em-breve {
+  margin-left: auto;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-family: var(--texto);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}

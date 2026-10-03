@@ -16,31 +16,11 @@ export const db = usePostgres
     })
   : {
       async query(sql, params = []) {
-        // $1, $2... (Postgres) viram ?1, ?2... (parâmetros posicionais do SQLite)
+        // $1, $2... (Postgres) viram ?1, ?2... (parâmetros posicionais do SQLite).
+        // O SQLite já entende RETURNING, então a mesma query serve para os dois bancos.
         const sqlText = String(sql).trim().replace(/\$(\d+)/g, "?$1");
-        const statement = sqliteDb.prepare(sqlText);
-
-        if (sqlText.toUpperCase().startsWith("INSERT")) {
-          const result = statement.run(...params);
-
-          if (sqlText.toUpperCase().includes("RETURNING")) {
-            const rows = sqliteDb
-              .prepare(
-                `SELECT id, titulo, conteudoHtml, dataCriacao FROM documentos WHERE id = ?`,
-              )
-              .all(Number(result.lastInsertRowid));
-
-            return { rows };
-          }
-
-          return {
-            rows: [{ id: Number(result.lastInsertRowid) }],
-          };
-        }
-
-        return {
-          rows: statement.all(...params),
-        };
+        const valores = params.map((v) => (v === undefined ? null : v));
+        return { rows: sqliteDb.prepare(sqlText).all(...valores) };
       },
       prepare(sql) {
         return sqliteDb.prepare(sql);
@@ -50,29 +30,103 @@ export const db = usePostgres
       },
     };
 
+// Erro de UNIQUE (ex.: e-mail já cadastrado), no Postgres e no SQLite
+export function ehErroDeDuplicado(error) {
+  return error?.code === "23505" || error?.errcode === 2067;
+}
+
+// ---------- Tabelas ----------
+// Tudo com IF NOT EXISTS: rodar de novo não apaga nem altera nada que já existe.
+// A tabela documentos continua exatamente como estava.
+
+const POSTGRES = /*sql*/ `
+  CREATE TABLE IF NOT EXISTS documentos (
+    id SERIAL PRIMARY KEY,
+    titulo TEXT NOT NULL,
+    "conteudoHtml" TEXT NOT NULL,
+    "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  -- Usuários: leitores, funcionários e administradores no mesmo lugar
+  CREATE TABLE IF NOT EXISTS usuarios (
+    id SERIAL PRIMARY KEY,
+    nome TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    "senhaHash" TEXT,
+    role TEXT NOT NULL DEFAULT 'leitor'
+      CHECK (role IN ('leitor', 'funcionario', 'admin')),
+    "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "dataAtualizacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  -- Contas externas (Google hoje, outras no futuro) ligadas a um usuário
+  CREATE TABLE IF NOT EXISTS "usuarioProvedores" (
+    id SERIAL PRIMARY KEY,
+    "usuarioId" INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    provedor TEXT NOT NULL,
+    "provedorId" TEXT NOT NULL,
+    "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (provedor, "provedorId")
+  );
+
+  -- Sessões de login. Guarda só o hash do token, nunca o token em si
+  CREATE TABLE IF NOT EXISTS sessoes (
+    id SERIAL PRIMARY KEY,
+    "usuarioId" INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    "tokenHash" TEXT NOT NULL UNIQUE,
+    "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expiraEm" TIMESTAMPTZ NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS sessoes_usuario ON sessoes ("usuarioId");
+`;
+
+const SQLITE = /*sql*/ `
+  PRAGMA foreign_keys = ON;
+
+  CREATE TABLE IF NOT EXISTS documentos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    titulo TEXT NOT NULL,
+    conteudoHtml TEXT NOT NULL,
+    dataCriacao TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS usuarios (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    senhaHash TEXT,
+    role TEXT NOT NULL DEFAULT 'leitor'
+      CHECK (role IN ('leitor', 'funcionario', 'admin')),
+    dataCriacao TEXT NOT NULL DEFAULT (datetime('now')),
+    dataAtualizacao TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS usuarioProvedores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuarioId INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    provedor TEXT NOT NULL,
+    provedorId TEXT NOT NULL,
+    dataCriacao TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE (provedor, provedorId)
+  );
+
+  CREATE TABLE IF NOT EXISTS sessoes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    usuarioId INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+    tokenHash TEXT NOT NULL UNIQUE,
+    dataCriacao TEXT NOT NULL DEFAULT (datetime('now')),
+    expiraEm TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS sessoes_usuario ON sessoes (usuarioId);
+`;
+
 export async function inicializarBanco() {
   if (usePostgres) {
-    await db.query(/*sql*/ `
-      CREATE TABLE IF NOT EXISTS documentos (
-        id SERIAL PRIMARY KEY,
-        titulo TEXT NOT NULL,
-        "conteudoHtml" TEXT NOT NULL,
-        "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    console.log("Tabela documentos verificada com sucesso.");
+    await db.query(POSTGRES);
+    console.log("Tabelas verificadas com sucesso (PostgreSQL).");
     return;
   }
 
-  sqliteDb.exec(/*sql*/ `
-    CREATE TABLE IF NOT EXISTS documentos (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      titulo TEXT NOT NULL,
-      conteudoHtml TEXT NOT NULL,
-      dataCriacao TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-  `);
-
+  sqliteDb.exec(SQLITE);
   console.log("Banco local SQLite inicializado com sucesso.");
 }

@@ -1,81 +1,55 @@
-import { useEffect, useState, type FormEvent } from "react";
-import { CloseIcon, LockIcon } from "../icons";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { destinoAposLogin, useAuth } from "../../hooks/useAuth";
+import type { Usuario } from "../../lib/autenticacao";
+import AuthForm from "../auth/AuthForm";
+import { CloseIcon } from "../icons";
 
-type Props = {
-  aberto: boolean;
-  fechar: () => void;
-  entrar: (email: string, senha: string) => boolean;
-};
-
-export default function LoginModal({ aberto, fechar, entrar }: Props) {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [erro, setErro] = useState("");
+// Modal de entrar/criar conta. Abre pelo "Access" do rodapé ou quando uma ação
+// precisa de conta (exigirLogin). O conteúdo da página continua lá atrás.
+export default function LoginModal() {
+  const { pedido, abrirLogin, fecharLogin } = useAuth();
+  const navigate = useNavigate();
+  const aberto = pedido !== null;
 
   useEffect(() => {
     if (!aberto) return;
-    setEmail("");
-    setSenha("");
-    setErro("");
-
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && fechar();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && fecharLogin();
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [aberto, fechar]);
+  }, [aberto, fecharLogin]);
 
-  function enviar(e: FormEvent) {
-    e.preventDefault();
-    if (entrar(email, senha)) fechar();
-    else setErro("E-mail ou senha incorretos.");
+  if (!pedido) return null;
+
+  function concluir(usuario: Usuario) {
+    fecharLogin();
+    // Veio do "Access": leitor vai para o perfil, admin para o painel.
+    // Veio de uma ação (curtir, comentar...): continua na mesma página.
+    if (!pedido?.motivo) navigate(destinoAposLogin(usuario.permissoes));
   }
 
-  if (!aberto) return null;
+  const trocarModo = () => abrirLogin({ ...pedido, modo: pedido.modo === "entrar" ? "cadastro" : "entrar" });
 
   return (
     <div className="fc-modal" role="dialog" aria-modal="true" aria-labelledby="titulo-login">
-      <div className="fc-modal-fundo" onClick={fechar} />
+      <div className="fc-modal-fundo" onClick={fecharLogin} />
       <div className="fc-modal-caixa">
-        <button type="button" className="fc-icon-btn fc-modal-fechar" onClick={fechar} aria-label="Fechar">
+        <button type="button" className="fc-icon-btn fc-modal-fechar" onClick={fecharLogin} aria-label="Fechar">
           <CloseIcon />
         </button>
 
-        <span className="fc-modal-icone">
-          <LockIcon />
-        </span>
-        <h2 id="titulo-login">Acesso restrito</h2>
-        <p className="fc-modal-sub">Entre para escrever e gerenciar os artigos.</p>
-
-        <form onSubmit={enviar} className="fc-form">
-          <label className="fc-campo">
-            <span>Email</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoFocus
-              required
-            />
-          </label>
-          <label className="fc-campo">
-            <span>Senha</span>
-            <input
-              type="password"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              required
-            />
-          </label>
-
-          {erro && <p className="fc-erro" role="alert">{erro}</p>}
-
-          <button type="submit" className="fc-btn fc-btn--primario">
-            Entrar
-          </button>
-        </form>
+        <AuthForm
+          key={pedido.modo}
+          modo={pedido.modo}
+          trocarModo={trocarModo}
+          aoConcluir={concluir}
+          motivo={pedido.motivo}
+          voltar={pedido.voltar}
+        />
       </div>
     </div>
   );

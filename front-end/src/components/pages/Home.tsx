@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { useArtigos } from "../../hooks/useArtigos";
-import { useAdmin } from "../../hooks/useAdmin";
+import { useAuth } from "../../hooks/useAuth";
 import { buscarCategoria, categoriaDe } from "../../lib/categorias";
 import { resumo } from "../../lib/format";
 import FeaturedView from "../home/FeaturedView";
@@ -8,14 +8,14 @@ import Sidebar from "../home/Sidebar";
 import TimelineView from "../home/TimelineView";
 import type { Visao } from "../home/ViewToggle";
 import AdminBar from "../admin/AdminBar";
-import ContaForm from "../admin/ContaForm";
 import Novidades from "../admin/Novidades";
 import ArtigoRow from "../home/ArtigoRow";
 import { Head } from "../layout/Head";
 
 export default function Home() {
   const { artigos, carregando, erro } = useArtigos();
-  const { logado } = useAdmin();
+  const { pode } = useAuth();
+  const logado = pode("artigos:gerenciar");
   const [params, setParams] = useSearchParams();
 
   const visao: Visao = params.get("visao") === "linha-do-tempo" ? "linha-do-tempo" : "destaques";
@@ -89,7 +89,6 @@ export default function Home() {
           )
         )}
 
-        {logado && <ContaForm />}
       </div>
     </main>
   );

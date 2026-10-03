@@ -1,20 +1,41 @@
 import { tempo } from "./format";
 
-// Endereço da API, escolhido nesta ordem:
-// 1. VITE_API_URL no .env, se existir (força um endereço qualquer)
-// 2. `npm run dev:prod` → API de produção, com o front rodando local
-// 3. `npm run dev`      → API local (back-end rodando em localhost:3000)
-// 4. build (Vercel)     → API de produção
-export const API_LOCAL = "http://localhost:3000";
-export const API_PRODUCAO = "https://writeapi.onrender.com";
+// Endereço da API. O padrão é /api, no mesmo domínio do site: o Vite (em dev)
+// e a Vercel (em produção) repassam para o back-end. Ver vite.config.ts e vercel.json.
+//   npm run dev       → API local (back-end rodando em localhost:3000)
+//   npm run dev:prod  → API de produção, com o front rodando local
+//   build (Vercel)    → API de produção
+// VITE_API_URL força outro endereço, mas aí o login não funciona
+// (o cookie de sessão é do domínio do site).
+export const API_URL: string = import.meta.env.VITE_API_URL || "/api";
 
-const usarLocal = import.meta.env.DEV && import.meta.env.MODE !== "producao";
+// Erro com o status HTTP, para a tela saber se foi falta de login (401) ou de permissão (403)
+export class ErroApi extends Error {
+  status: number;
 
-export const API_URL: string =
-  import.meta.env.VITE_API_URL || (usarLocal ? API_LOCAL : API_PRODUCAO);
+  constructor(mensagem: string, status: number) {
+    super(mensagem);
+    this.status = status;
+  }
+}
 
-if (import.meta.env.DEV) {
-  console.info(`[Write] usando a API: ${API_URL}`);
+// fetch com JSON nos dois sentidos. Lança ErroApi com a mensagem do back-end.
+export async function requisitar<T = Record<string, unknown>>(
+  caminho: string,
+  opcoes: RequestInit = {},
+): Promise<T> {
+  const response = await fetch(`${API_URL}${caminho}`, {
+    ...opcoes,
+    headers: { "Content-Type": "application/json", ...opcoes.headers },
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new ErroApi(data.mensagem || "Não foi possível falar com o servidor.", response.status);
+  }
+
+  return data as T;
 }
 
 export type Artigo = {
@@ -34,7 +55,7 @@ export type NovoArtigo = {
   tags?: string[];
 };
 
-// GET /documentos — mesma rota que você já usa
+// GET /documentos — pública, não precisa de login
 export async function listarArtigos(): Promise<Artigo[]> {
   const response = await fetch(`${API_URL}/documentos`, {
     headers: { "Content-Type": "application/json" },
@@ -53,53 +74,18 @@ export async function listarArtigos(): Promise<Artigo[]> {
   return [...lista].sort((a, b) => tempo(b.dataCriacao) - tempo(a.dataCriacao));
 }
 
-// POST /publicar — mesma rota que você já usa.
+// POST /publicar — exige conta com permissão de gerenciar artigos.
 // categoria e tags vão junto; se o back-end ainda não salvar, ele só ignora.
 export async function publicarArtigo(artigo: NovoArtigo) {
-  const response = await fetch(`${API_URL}/publicar`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(artigo),
-  });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.mensagem || "Erro ao publicar artigo");
-  }
-
-  return data;
+  return requisitar("/publicar", { method: "POST", body: JSON.stringify(artigo) });
 }
 
 // PUT /documentos/:id — edita um artigo já publicado
 export async function atualizarArtigo(id: string | number, artigo: NovoArtigo) {
-  const response = await fetch(`${API_URL}/documentos/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(artigo),
-  });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.mensagem || "Erro ao atualizar artigo");
-  }
-
-  return data;
+  return requisitar(`/documentos/${id}`, { method: "PUT", body: JSON.stringify(artigo) });
 }
 
 // DELETE /documentos/:id — apaga um artigo publicado
 export async function excluirArtigo(id: string | number) {
-  const response = await fetch(`${API_URL}/documentos/${id}`, {
-    method: "DELETE",
-    headers: { "Content-Type": "application/json" },
-  });
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data.mensagem || "Erro ao excluir artigo");
-  }
-
-  return data;
+  return requisitar(`/documentos/${id}`, { method: "DELETE" });
 }

@@ -5,6 +5,12 @@ import Article from "./components/pages/Article";
 import Editor from "./components/pages/Editor";
 import Rascunhos from "./components/pages/Rascunhos";
 import Embed from "./components/pages/Embed";
+import Entrar from "./components/pages/Entrar";
+import Perfil from "./components/pages/Perfil";
+import AdminPainel from "./components/pages/AdminPainel";
+import AdminArtigos from "./components/pages/AdminArtigos";
+import AdminUsuarios from "./components/pages/AdminUsuarios";
+import RotaProtegida from "./components/auth/RotaProtegida";
 
 export default function App() {
   return (
@@ -14,15 +20,26 @@ export default function App() {
         <Route path="/embed/artigo/:id" element={<Embed />} />
 
         <Route element={<Layout />}>
+          {/* Públicas: ninguém precisa entrar para ler */}
           <Route path="/" element={<Home />} />
           <Route path="/artigo/:id" element={<Article />} />
-          <Route path="/editor" element={<Editor />} />
-          <Route path="/rascunhos" element={<Rascunhos />} />
+
+          {/* Conta */}
+          <Route path="/entrar" element={<Entrar modo="entrar" />} />
+          <Route path="/cadastro" element={<Entrar modo="cadastro" />} />
+          <Route path="/perfil" element={<RotaProtegida><Perfil /></RotaProtegida>} />
+
+          {/* Administração: o React esconde, a API bloqueia de verdade */}
+          <Route path="/admin" element={<RotaProtegida permissao="admin:acessar"><AdminPainel /></RotaProtegida>} />
+          <Route path="/admin/artigos" element={<RotaProtegida permissao="artigos:gerenciar"><AdminArtigos /></RotaProtegida>} />
+          <Route path="/admin/usuarios" element={<RotaProtegida permissao="usuarios:gerenciar"><AdminUsuarios /></RotaProtegida>} />
+          <Route path="/editor" element={<RotaProtegida permissao="artigos:gerenciar"><Editor /></RotaProtegida>} />
+          <Route path="/rascunhos" element={<RotaProtegida permissao="artigos:gerenciar"><Rascunhos /></RotaProtegida>} />
 
           {/* rotas antigas continuam funcionando */}
           <Route path="/article/:id" element={<Article />} />
-          <Route path="/meus-artigos" element={<Navigate to="/" replace />} />
-          <Route path="/perfil" element={<Navigate to="/" replace />} />
+          <Route path="/login" element={<Navigate to="/entrar" replace />} />
+          <Route path="/meus-artigos" element={<Navigate to="/admin/artigos" replace />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

@@ -1,24 +1,25 @@
 import Brand from "./Brand";
+import UserMenu from "./UserMenu";
 import { ArrowRightIcon } from "../icons";
+import { useAuth } from "../../hooks/useAuth";
 
-type Props = {
-  logado: boolean;
-  abrirLogin: () => void;
-  sair: () => void;
-};
+export default function Footer() {
+  const { usuario, carregando, abrirLogin } = useAuth();
 
-export default function Footer({ logado, abrirLogin, sair }: Props) {
   return (
     <footer className="fc-footer">
       <div className="fc-footer-linha">
         <Brand />
-        {logado ? (
-          <button type="button" className="fc-access" onClick={sair}>
-            Sair
-            <ArrowRightIcon />
-          </button>
+        {usuario ? (
+          <UserMenu />
         ) : (
-          <button type="button" className="fc-access" onClick={abrirLogin}>
+          // Enquanto a sessão carrega, o espaço fica reservado (sem piscar "Access")
+          <button
+            type="button"
+            className="fc-access"
+            onClick={() => abrirLogin()}
+            style={carregando ? { visibility: "hidden" } : undefined}
+          >
             Access
             <ArrowRightIcon />
           </button>

@@ -3,6 +3,7 @@ export class Router {
     GET: {},
     POST: {},
     PUT: {},
+    PATCH: {},
     DELETE: {},
   };
 
@@ -16,6 +17,10 @@ export class Router {
 
   put(route, handle) {
     this.routes["PUT"][route] = handle;
+  }
+
+  patch(route, handle) {
+    this.routes["PATCH"][route] = handle;
   }
 
   delete(route, handle) {

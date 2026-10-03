@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { useAdmin } from "../../hooks/useAdmin";
+import { Link } from "react-router-dom";
 import { lerRascunhos, removerRascunho } from "../../lib/rascunhos";
 import { dataPorExtenso, tempoRelativo } from "../../lib/format";
 import { ArrowLeftIcon, ArrowRightIcon } from "../icons";
@@ -8,10 +7,7 @@ import AdminBar from "../admin/AdminBar";
 import { Head } from "../layout/Head";
 
 export default function Rascunhos() {
-  const { logado } = useAdmin();
   const [rascunhos, setRascunhos] = useState(lerRascunhos);
-
-  if (!logado) return <Navigate to="/" replace />;
 
   function excluir(id: string) {
     removerRascunho(id);

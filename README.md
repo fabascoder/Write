@@ -102,30 +102,60 @@ Sem a variável `DATABASE_URL`, a API cria e usa o arquivo local `banco.db`. Com
 ```bash
 cd front-end
 npm install
-cp .env.example .env
-npm run dev        # http://localhost:5173
+npm run dev        # http://localhost:5173 → usa a API local
+npm run dev:prod   # front local usando a API de produção
 ```
+
+O front chama a API sempre por `/api`, no mesmo domínio do site: o Vite (em desenvolvimento) e a Vercel (`vercel.json`, em produção) repassam para o back-end. Isso mantém o cookie de login no domínio do site.
+
+**3. Primeiro administrador**
+
+```bash
+cd back-end
+npm run admin -- voce@email.com
+```
+
+Se a conta já existe (criada pelo site ou pelo Google), ela vira administradora. Se não existe, o script pede nome e senha (a senha não aparece na tela) e cria a conta já como admin. O script usa o mesmo banco do servidor: com `DATABASE_URL` no `.env`, mexe no PostgreSQL.
 
 ### Variáveis de ambiente
 
 | Onde | Variável | Para que serve |
 |---|---|---|
-| `front-end/.env` | `VITE_API_URL` | Endereço da API. Sem ela, usa a API publicada no Render. |
-| `front-end/.env` | `VITE_ADMIN_EMAIL` · `VITE_ADMIN_SENHA` | Dados de acesso da área do autor. |
 | `back-end/.env` | `DATABASE_URL` | Conexão com o PostgreSQL. Sem ela, usa SQLite local. |
 | `back-end/.env` | `PORT` | Porta do servidor. O padrão é `3000`. |
+| `back-end/.env` | `APP_URL` | Endereço público do front (em produção, `https://write-w.vercel.app`). Define a volta do login com Google e liga o cookie `Secure`. |
+| `back-end/.env` | `GOOGLE_CLIENT_ID` · `GOOGLE_CLIENT_SECRET` | Login com Google (opcional). Sem eles, o botão não aparece. |
+| `front-end/.env` | `VITE_API_URL` | Opcional. Força outro endereço de API, mas aí o login não funciona. |
 
-> O login é conferido no próprio navegador, porque a API ainda não tem rota de autenticação. Ele esconde a área de escrita de quem visita, mas não substitui uma proteção no servidor.
+Veja `back-end/.env.example` e `front-end/.env.example`.
+
+## Contas e permissões
+
+Ler é livre: artigos, compartilhamento e a página `/embed` não pedem login. A conta serve para o que depende de alguém (curtir, comentar, favoritar, acompanhar livros…).
+
+- **Um login só** para todo mundo, com e-mail e senha ou com Google. Uma pessoa que já tem conta e entra com o Google do mesmo e-mail continua na mesma conta.
+- **Roles:** `leitor` (padrão de quem se cadastra), `funcionario` e `admin`. O cadastro nunca escolhe a role.
+- **Permissões:** as rotas conferem permissões (`artigos:gerenciar`, `usuarios:gerenciar`…), definidas em `back-end/auth/permissoes.mjs`. Para dar poderes ao funcionário, é só acrescentar na lista dele.
+- **Segurança:** senha com hash `scrypt`, sessão em cookie `httpOnly` + `SameSite=Lax` (guardada no banco só como hash), limite de tentativas de login. O React só esconde botões; quem bloqueia é a API (401 sem login, 403 sem permissão).
 
 ## API
 
-| Método | Rota | O que faz |
-|---|---|---|
-| `GET` | `/` | Confere se a API está no ar |
-| `GET` | `/documentos` | Lista os artigos, do mais recente ao mais antigo |
-| `POST` | `/publicar` | Publica um novo artigo |
-| `PUT` | `/documentos/:id` | Edita um artigo publicado |
-| `DELETE` | `/documentos/:id` | Apaga um artigo publicado |
+| Método | Rota | Acesso | O que faz |
+|---|---|---|---|
+| `GET` | `/` | público | Confere se a API está no ar |
+| `GET` | `/documentos` | público | Lista os artigos, do mais recente ao mais antigo |
+| `POST` | `/publicar` | `artigos:gerenciar` | Publica um novo artigo |
+| `PUT` | `/documentos/:id` | `artigos:gerenciar` | Edita um artigo publicado |
+| `DELETE` | `/documentos/:id` | `artigos:gerenciar` | Apaga um artigo publicado |
+| `POST` | `/auth/cadastro` | público | Cria conta de leitor e já entra |
+| `POST` | `/auth/login` | público | Entra com e-mail e senha |
+| `POST` | `/auth/logout` | público | Encerra a sessão |
+| `GET` | `/auth/eu` | público | Quem está logado (ou `null`) |
+| `PATCH` | `/auth/eu` | logado | Muda o nome |
+| `GET` | `/auth/google` | público | Começa o login com Google |
+| `GET` | `/auth/google/callback` | Google | Volta do Google |
+| `GET` | `/usuarios` | `usuarios:gerenciar` | Lista as contas |
+| `PATCH` | `/usuarios/:id/role` | `usuarios:gerenciar` | Muda o tipo de conta |
 
 **Corpo de publicação e edição**
 
@@ -141,7 +171,9 @@ npm run dev        # http://localhost:5173
 ## Próximos passos
 
 - [ ] Salvar categoria e tags no banco
-- [ ] Rota de login com token na API
+- [x] Contas, login (e-mail e Google) e permissões na API
+- [ ] Ligar artigos ao autor (`autorId` em `documentos`)
+- [ ] Curtidas, comentários, favoritos e notificações
 - [ ] Buscar um artigo por `id` direto na API
 - [ ] Rascunhos salvos no servidor, e não só no navegador
 - [ ] Imagem de capa nos artigos

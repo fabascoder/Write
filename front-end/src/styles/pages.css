@@ -228,3 +228,122 @@
 }
 .fc-artigo-info .fc-meta { margin: 0; }
 .fc-artigo-info .fc-opcoes { margin-right: -8px; }
+
+/* ---------- Meu perfil ---------- */
+.fc-perfil-pagina { max-width: 640px; }
+.fc-perfil {
+  margin-bottom: 26px;
+  padding: 26px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+}
+.fc-perfil-topo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.fc-perfil-avatar {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--azul-claro);
+  font-family: var(--titulo);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--azul);
+}
+.fc-perfil-nome {
+  font-family: var(--titulo);
+  font-size: 20px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.fc-perfil-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 13.5px;
+  color: var(--tinta-3);
+}
+.fc-perfil-role { font-weight: 600; color: var(--azul); }
+.fc-perfil-form input[readonly] { border-color: var(--linha); background: var(--cinza); color: var(--tinta-2); }
+.fc-perfil-google { font-size: 13.5px; color: var(--tinta-3); }
+.fc-perfil-acoes { display: flex; flex-wrap: wrap; gap: 10px; }
+.fc-perfil-acoes .fc-btn:disabled { opacity: 0.55; cursor: default; }
+
+/* ---------- Painel administrativo ---------- */
+.fc-admin-ola {
+  margin: -14px 0 26px;
+  color: var(--tinta-3);
+}
+.fc-admin-atalhos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin-bottom: 40px;
+}
+.fc-admin-atalho {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 100%;
+  padding: 18px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+  transition: border-color 0.2s var(--suave), background 0.2s var(--suave);
+}
+.fc-admin-atalho:hover { border-color: var(--azul); background: var(--azul-claro); }
+.fc-admin-atalho > span:nth-child(2) { display: grid; flex: 1; min-width: 0; }
+.fc-admin-atalho strong { font-family: var(--titulo); font-size: 16px; font-weight: 600; }
+.fc-admin-atalho small { font-size: 13px; color: var(--tinta-3); }
+.fc-admin-atalho-icone {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 10px;
+  border-radius: 50%;
+  background: var(--azul-claro);
+  color: var(--azul);
+}
+
+/* ---------- Usuários ---------- */
+.fc-usuarios-aviso { margin-bottom: 16px; }
+.fc-usuarios { display: grid; gap: 10px; }
+.fc-usuarios-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 24px;
+  padding: 16px 18px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+}
+.fc-usuarios-dados { display: grid; gap: 2px; min-width: 0; }
+.fc-usuarios-dados strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--titulo);
+  font-size: 16px;
+  font-weight: 600;
+}
+.fc-usuarios-dados span,
+.fc-usuarios-dados small { font-size: 13.5px; color: var(--tinta-3); overflow-wrap: anywhere; }
+.fc-usuarios-voce {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--azul-claro);
+  font-family: var(--texto);
+  font-size: 11px !important;
+  font-weight: 600;
+  color: var(--azul) !important;
+}
+.fc-usuarios-role { width: min(200px, 100%); }
+.fc-usuarios-role select:disabled { border-color: var(--linha); background: var(--cinza); }
