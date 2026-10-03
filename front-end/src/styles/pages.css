@@ -454,17 +454,16 @@
   white-space: nowrap;
 }
 
-.fc-desemp-controles { display: flex; align-items: center; gap: 10px; }
-.fc-desemp-controles select { width: auto; height: 40px; }
-
 /* Abas: rolam de lado no celular, sem empurrar a página */
 .fc-abas {
   display: flex;
-  gap: 4px;
+  flex-wrap: wrap;
+  gap: 0 4px;
   margin-bottom: 24px;
-  overflow-x: auto;
   border-bottom: 1px solid var(--linha-2);
-  scrollbar-width: thin;
+}
+@media (max-width: 760px) {
+  .fc-abas { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
 }
 .fc-aba {
   display: inline-flex;
@@ -520,27 +519,6 @@
 .fc-veredito--ruim { background: var(--ruim-claro); }
 .fc-veredito--ruim strong { color: var(--ruim); }
 .fc-veredito--ruim .fc-veredito-ponto { background: var(--ruim); }
-
-/* Números */
-.fc-numeros {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
-  margin: 16px 0 0;
-}
-.fc-numeros div {
-  padding: 14px 16px;
-  border: 1px solid var(--linha-2);
-  border-radius: var(--raio);
-}
-.fc-numeros dt { font-size: 12.5px; color: var(--tinta-3); }
-.fc-numeros dd {
-  margin: 4px 0 0;
-  font-family: var(--titulo);
-  font-size: 20px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
 
 .fc-desemp-bloco { margin-top: 28px; }
 
@@ -629,3 +607,279 @@
 .fc-desemp-rota + .fc-desemp-bloco { margin-top: 8px; }
 
 .fc-desemp-nota { margin-top: 36px; font-size: 13px; color: var(--tinta-3); }
+
+/* ---------- Desempenho: filtros, destaques e gráficos ---------- */
+.fc-desemp-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: -6px 0 22px;
+}
+.fc-desemp-filtros select { width: auto; height: 40px; }
+.fc-desemp-quando { margin-left: auto; font-size: 13px; color: var(--tinta-3); }
+.fc-desemp-aviso {
+  margin: -8px 0 18px;
+  padding: 10px 14px;
+  border-radius: var(--raio);
+  background: var(--atencao-claro);
+  font-size: 14px;
+  color: var(--atencao);
+}
+
+/* Ao atualizar, o conteúdo fica apagadinho em vez de sumir */
+.fc-desemp-painel { transition: opacity 0.2s var(--suave); }
+.fc-desemp-painel.is-atualizando { opacity: 0.55; }
+
+.fc-btn--pequeno { height: 34px; padding: 0 12px; font-size: 13.5px; }
+.fc-num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Veredito com ícone dentro do círculo (a cor nunca fala sozinha) */
+.fc-veredito-ponto {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+.fc-veredito--atencao .fc-veredito-ponto { color: var(--tinta); }
+.fc-veredito-variacao { font-weight: 500; }
+
+/* Número principal da visão geral */
+.fc-heroi {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 18px 28px;
+}
+.fc-heroi-rotulo { font-size: 14px; color: var(--tinta-3); }
+.fc-heroi-valor {
+  font-family: var(--texto);
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--tinta);
+}
+.fc-heroi-ajuda { max-width: 220px; font-size: 13px; color: var(--tinta-3); }
+
+/* Destaques (números com comparação ao período anterior) */
+.fc-destaques {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 16px 0 0;
+}
+.fc-destaque-num {
+  padding: 14px 16px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+}
+.fc-destaque-num dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--tinta-3);
+}
+.fc-destaque-num dd { display: grid; gap: 4px; margin: 4px 0 0; }
+.fc-destaque-valor { font-size: 22px; font-weight: 600; color: var(--tinta); }
+.fc-variacao { font-size: 12px; color: var(--tinta-3); }
+.fc-variacao--melhor { color: var(--bom); }
+.fc-variacao--pior { color: var(--ruim); }
+.fc-ajuda {
+  display: inline-grid;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  border: 1px solid var(--linha);
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--tinta-3);
+  cursor: help;
+}
+
+/* Cartão de cada gráfico */
+.fc-grafico {
+  min-width: 0;
+  margin: 18px 0 0;
+  padding: 18px 18px 12px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+  background: var(--branco);
+}
+.fc-grafico-titulo { font-family: var(--titulo); font-size: 16px; font-weight: 600; color: var(--tinta); }
+.fc-grafico-subtitulo { margin-top: 2px; font-size: 13px; color: var(--tinta-3); }
+.fc-grafico-legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 12px;
+}
+.fc-grafico-area { margin-top: 12px; }
+.fc-grafico-nota { margin-top: 12px; font-size: 13.5px; color: var(--tinta-2); }
+
+.fc-graficos-duplos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 14px;
+}
+@media (max-width: 760px) {
+  .fc-graficos-duplos { grid-template-columns: 1fr; }
+  .fc-heroi { grid-template-columns: 1fr; }
+  .fc-desemp-quando { margin-left: 0; }
+}
+
+/* Legenda: quadradinho para barras, traço para linhas */
+.fc-legenda-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--tinta-2);
+  white-space: nowrap;
+}
+.fc-legenda-chave { flex-shrink: 0; width: 10px; height: 10px; border-radius: 2px; }
+.fc-legenda-chave--linha { width: 16px; height: 2px; border-radius: 2px; }
+.fc-legenda-chave--tracejada {
+  width: 16px;
+  height: 0;
+  border-top: 2px dashed;
+  border-radius: 0;
+  background: none;
+}
+
+/* Tabela com os números do gráfico */
+.fc-grafico-tabela { margin-top: 8px; }
+.fc-grafico-tabela summary {
+  display: inline-block;
+  padding: 4px 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--azul);
+  cursor: pointer;
+}
+.fc-grafico-tabela[open] summary { margin-bottom: 6px; }
+
+/* Dica ao passar o mouse: valor em destaque, nome depois */
+.fc-dica-grafico {
+  min-width: 160px;
+  padding: 10px 12px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+  background: var(--branco);
+  box-shadow: 0 10px 28px rgba(16, 21, 28, 0.12);
+  font-size: 13px;
+}
+.fc-dica-titulo { margin-bottom: 6px; font-size: 12px; color: var(--tinta-3); }
+.fc-dica-linha { display: flex; align-items: center; gap: 8px; color: var(--tinta-3); }
+.fc-dica-linha + .fc-dica-linha { margin-top: 4px; }
+.fc-dica-linha strong { font-size: 14px; color: var(--tinta); font-variant-numeric: tabular-nums; }
+.fc-dica-chave { flex-shrink: 0; width: 12px; height: 3px; border-radius: 2px; }
+
+/* Para onde vai o tempo: barra única com 2px de espaço entre as partes */
+.fc-composicao-barra {
+  display: flex;
+  gap: 2px;
+  height: 20px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--linha-2);
+}
+.fc-composicao-parte { min-width: 3px; }
+.fc-composicao-legenda { display: grid; gap: 8px; margin-top: 14px; }
+.fc-composicao-legenda li {
+  display: grid;
+  grid-template-columns: 1fr auto 48px;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+}
+.fc-composicao-legenda strong { font-variant-numeric: tabular-nums; color: var(--tinta); }
+.fc-composicao-legenda li > span:last-child { text-align: right; color: var(--tinta-3); font-variant-numeric: tabular-nums; }
+
+/* Lista de áreas da visão geral, com a mini linha de tendência */
+.fc-desemp-area { display: grid; grid-template-columns: 1fr auto auto; }
+.fc-desemp-area-nome { display: grid; gap: 2px; min-width: 0; }
+.fc-mini-linha { display: block; }
+.fc-mini-linha--vazia { width: 96px; height: 28px; }
+@media (max-width: 480px) {
+  .fc-mini-linha, .fc-mini-linha--vazia { display: none; }
+  .fc-desemp-area { grid-template-columns: 1fr auto; }
+}
+
+.fc-desemp-bloco-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.fc-desemp-bloco-topo .fc-rotulo { margin-bottom: 0; }
+
+/* Recharts: tira o contorno de foco que aparece ao clicar no gráfico */
+.fc-grafico .recharts-wrapper:focus,
+.fc-grafico .recharts-surface:focus { outline: none; }
+
+/* Barras deitadas em HTML (comparações e rotas) */
+.fc-grafico-area { container-type: inline-size; }
+.fc-barras { display: grid; gap: 6px; }
+.fc-barra-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--rotulo, 140px) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 6px 4px;
+  border-radius: 6px;
+  outline-offset: 0;
+}
+.fc-barra-item:hover,
+.fc-barra-item:focus-visible { background: rgba(11, 110, 224, 0.06); }
+.fc-barra-nome {
+  overflow: hidden;
+  font-size: 12.5px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--tinta-2);
+}
+.fc-barra-nome--mono { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12px; }
+.fc-barra-trilho { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.fc-barra {
+  flex-shrink: 0;
+  min-width: 2px;
+  height: 14px;
+  border-radius: 0 4px 4px 0;
+  transition: filter 0.2s var(--suave);
+}
+.fc-barra-item:hover .fc-barra { filter: brightness(1.12); }
+.fc-barra-valor { font-size: 12.5px; color: var(--tinta-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Dica da barra: aparece ao passar o mouse ou focar com o teclado */
+.fc-barra-dica {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: var(--rotulo, 140px);
+  z-index: 5;
+  display: none;
+  pointer-events: none;
+}
+.fc-barra-dica .fc-dica-titulo,
+.fc-barra-dica .fc-dica-linha { display: flex; }
+.fc-barra-item:hover .fc-barra-dica,
+.fc-barra-item:focus-visible .fc-barra-dica { display: block; }
+
+/* Cartão estreito: nome em cima, barra embaixo usando a largura toda */
+@container (max-width: 420px) {
+  .fc-barra-item { grid-template-columns: 1fr; gap: 4px; }
+  .fc-barra-nome { text-align: left; }
+  .fc-barra-dica { left: 4px; }
+}

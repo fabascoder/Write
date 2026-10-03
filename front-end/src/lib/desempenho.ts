@@ -23,20 +23,53 @@ export type Recente = {
   detalhes: Record<string, number | boolean>;
 };
 
+export type Comparacao = { total: number; media: number | null; mediana: number | null; p95: number | null };
+
+/** Uma medição, compacta: t = quando, d = duração, s = servidor, b = bytes,
+ *  e = erro, f = primeira visita, c = celular, r = rtt da internet, i = tempo das imagens */
+export type Amostra = {
+  t: number;
+  d: number;
+  s: number | null;
+  b: number | null;
+  e: 0 | 1;
+  f: 0 | 1;
+  c: 0 | 1 | null;
+  r: number | null;
+  i: number | null;
+};
+
+export type PontoSerie = {
+  inicio: string;
+  total: number;
+  media: number | null;
+  mediana: number | null;
+  p95: number | null;
+  erros: number;
+};
+
 export type ResumoAcao = Estatisticas & {
   detalhes: Record<string, number>;
   primeiraVisita: { total: number; media: number | null };
   navegando: { total: number; media: number | null };
+  anterior: Comparacao;
   recentes: Recente[];
+  amostras: Amostra[];
 };
 
-export type ResumoRota = Estatisticas & { rota: string; erros5xx: number };
+export type ResumoRota = Estatisticas & { rota: string; erros5xx: number; anterior: Comparacao };
 
 export type Resumo = {
   dias: number;
   geradoEm: string;
+  inicio: string;
+  fim: string;
+  /** Tamanho de cada ponto dos gráficos de linha, em ms */
+  balde: number;
+  truncado: boolean;
   navegador: Partial<Record<AcaoMedida, ResumoAcao>>;
   servidor: ResumoRota[];
+  servidorGeral: Estatisticas & { erros5xx: number; anterior: Comparacao; serie: PontoSerie[] };
 };
 
 export function buscarDesempenho(dias: number) {
@@ -210,6 +243,36 @@ export function diagnosticar(acao: (typeof ACOES)[number], d: ResumoAcao | undef
     });
   }
 
+  // Celular bem mais lento que o computador
+  const [computador, celular] = porAparelho(d.amostras ?? []);
+  if (
+    celular.total >= 3 &&
+    computador.total >= 3 &&
+    celular.mediana !== null &&
+    computador.mediana !== null &&
+    celular.mediana > computador.mediana * 1.8 &&
+    celular.mediana > acao.bom
+  ) {
+    problemas.push({
+      motivo: `No celular leva ${ms(celular.mediana)}; no computador, ${ms(computador.mediana)}.`,
+      dica:
+        "Celulares têm internet e processador mais fracos, então fotos pesadas e páginas grandes pesam mais neles. " +
+        "Otimize as fotos e reduza o que cada página baixa — quem lê no celular é quem mais sente.",
+    });
+  }
+
+  // Muita gente com internet lenta (o Chrome informa a latência)
+  const comConexao = (d.amostras ?? []).filter((a) => a.r !== null);
+  const lentas = comConexao.filter((a) => (a.r ?? 0) > 300).length;
+  if (comConexao.length >= 5 && lentas / comConexao.length > 0.3 && status !== "bom") {
+    problemas.push({
+      motivo: `${Math.round((lentas / comConexao.length) * 100)}% das leituras vieram de uma internet lenta (resposta acima de 300 ms).`,
+      dica:
+        "Não dá para mudar a internet de quem lê, mas dá para mandar menos coisa: páginas e fotos mais leves " +
+        "fazem mais diferença justamente para essas pessoas.",
+    });
+  }
+
   // Ruim e nenhuma causa óbvia: mostra onde o tempo foi gasto
   if (status === "ruim" && problemas.length === 0) {
     problemas.push(
@@ -292,4 +355,128 @@ export function diagnosticarRota(r: ResumoRota): Diagnostico {
 export function statusGeral(diagnosticos: Diagnostico[]): Status {
   const ordem: Status[] = ["ruim", "atencao", "bom"];
   return ordem.find((s) => diagnosticos.some((d) => d.status === s)) ?? "sem-dados";
+}
+
+// ---------- Contas para os gráficos (a partir das amostras) ----------
+
+function percentilDe(ordenados: number[], p: number) {
+  if (ordenados.length === 0) return null;
+  const i = Math.min(ordenados.length - 1, Math.ceil((p / 100) * ordenados.length) - 1);
+  return ordenados[Math.max(0, i)];
+}
+
+export function medianaDe(valores: number[]) {
+  return percentilDe([...valores].sort((a, b) => a - b), 50);
+}
+
+// Agrupa as amostras por intervalo de tempo (linha do tempo)
+export function serieDasAmostras(amostras: Amostra[], inicio: string, fim: string, balde: number): PontoSerie[] {
+  const de = Math.floor(new Date(inicio).getTime() / balde) * balde;
+  const ate = new Date(fim).getTime();
+  const grupos = new Map<number, number[]>();
+  const erros = new Map<number, number>();
+  for (let t = de; t < ate; t += balde) grupos.set(t, []);
+
+  for (const a of amostras) {
+    const t = Math.floor(a.t / balde) * balde;
+    grupos.get(t)?.push(a.d);
+    if (a.e) erros.set(t, (erros.get(t) ?? 0) + 1);
+  }
+
+  return [...grupos.entries()].map(([t, tempos]) => {
+    const ordenados = tempos.sort((a, b) => a - b);
+    return {
+      inicio: new Date(t).toISOString(),
+      total: ordenados.length,
+      media: ordenados.length ? Math.round(ordenados.reduce((a, b) => a + b, 0) / ordenados.length) : null,
+      mediana: percentilDe(ordenados, 50),
+      p95: percentilDe(ordenados, 95),
+      erros: erros.get(t) ?? 0,
+    };
+  });
+}
+
+// Satisfação (índice Apdex): rápidas contam 1, aceitáveis contam meio, lentas contam 0
+export function satisfacao(amostras: Amostra[], bom: number, ruim: number) {
+  if (amostras.length === 0) return null;
+  const rapidas = amostras.filter((a) => a.d <= bom).length;
+  const aceitaveis = amostras.filter((a) => a.d > bom && a.d <= ruim).length;
+  return (rapidas + aceitaveis / 2) / amostras.length;
+}
+
+export type Faixa = { faixa: string; rotulo: string; de: number; ate: number; total: number; parte: number; zona: Exclude<Status, "sem-dados"> };
+
+// Distribuição em faixas de tempo, com as faixas alinhadas aos limites da ação
+export function histograma(amostras: Amostra[], bom: number, ruim: number): Faixa[] {
+  const bordas = [0, bom / 2, bom, (bom + ruim) / 2, ruim, ruim * 2, ruim * 5, Infinity];
+  const total = amostras.length || 1;
+
+  return bordas.slice(0, -1).map((de, i) => {
+    const ate = bordas[i + 1];
+    const quantos = amostras.filter((a) => a.d > de && a.d <= ate).length + (i === 0 ? amostras.filter((a) => a.d === 0).length : 0);
+    return {
+      faixa: ate === Infinity ? `mais de ${ms(de)}` : i === 0 ? `até ${ms(ate)}` : `${ms(de)} a ${ms(ate)}`,
+      // Rótulo curto para o eixo (a faixa completa aparece ao passar o mouse)
+      rotulo: ate === Infinity ? `> ${ms(de)}` : `≤ ${ms(ate)}`,
+      de,
+      ate,
+      total: quantos,
+      parte: quantos / total,
+      zona: ate <= bom ? "bom" : ate <= ruim ? "atencao" : "ruim",
+    };
+  });
+}
+
+// Comparação com o período anterior. Para tempo, menor é melhor.
+export function variacao(atual: number | null, anterior: number | null | undefined) {
+  if (atual === null || !anterior) return null;
+  const pct = ((atual - anterior) / anterior) * 100;
+  if (Math.abs(pct) < 1) {
+    return { texto: "igual ao período anterior", curto: "igual ao anterior", melhorou: null as boolean | null, pct };
+  }
+  const curto = `${Math.abs(Math.round(pct))}% ${pct < 0 ? "mais rápido" : "mais lento"}`;
+  return { texto: `${curto} que o período anterior`, curto, melhorou: pct < 0, pct };
+}
+
+export type Grupo = { nome: string; total: number; mediana: number | null };
+
+export function porAparelho(amostras: Amostra[]): Grupo[] {
+  const celular = amostras.filter((a) => a.c === 1).map((a) => a.d);
+  const computador = amostras.filter((a) => a.c === 0).map((a) => a.d);
+  return [
+    { nome: "Computador", total: computador.length, mediana: medianaDe(computador) },
+    { nome: "Celular", total: celular.length, mediana: medianaDe(celular) },
+  ];
+}
+
+export function porVisita(amostras: Amostra[]): Grupo[] {
+  const primeira = amostras.filter((a) => a.f === 1).map((a) => a.d);
+  const navegando = amostras.filter((a) => a.f === 0).map((a) => a.d);
+  return [
+    { nome: "Navegando no site", total: navegando.length, mediana: medianaDe(navegando) },
+    { nome: "Primeira visita", total: primeira.length, mediana: medianaDe(primeira) },
+  ];
+}
+
+// Onde o tempo de uma ação vai, em média: servidor, imagens e o resto (internet + navegador)
+export function composicao(d: ResumoAcao) {
+  const total = d.media ?? 0;
+  const servidor = Math.min(total, d.servidorMedia ?? 0);
+  const imagens = Math.min(total - servidor, d.detalhes.imagensMs ?? 0);
+  return [
+    { nome: "Servidor", valor: servidor },
+    { nome: "Imagens carregando", valor: imagens },
+    { nome: "Internet e navegador", valor: Math.max(0, total - servidor - imagens) },
+  ].filter((p) => p.valor > 0 || p.nome !== "Imagens carregando");
+}
+
+// Planilha com cada medição da ação
+export function csvDasAmostras(amostras: Amostra[]) {
+  const linhas = [
+    "data,duracao_ms,servidor_ms,bytes,erro,primeira_visita,celular,internet_rtt_ms,imagens_ms",
+    ...amostras.map((a) =>
+      [new Date(a.t).toISOString(), a.d, a.s ?? "", a.b ?? "", a.e, a.f, a.c ?? "", a.r ?? "", a.i ?? ""].join(","),
+    ),
+  ];
+  return linhas.join("\n");
 }

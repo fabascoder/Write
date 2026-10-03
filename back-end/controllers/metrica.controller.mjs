@@ -16,6 +16,10 @@ const DETALHES = [
   "artigos",
   "frio",
   "capa",
+  // Aparelho e conexão de quem leu (sem identificar a pessoa)
+  "celular",
+  "rtt",
+  "downlink",
 ];
 
 // Cada IP manda no máximo 60 medições por minuto

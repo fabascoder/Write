@@ -16,7 +16,10 @@ export type Detalhes = Partial<
     | "bytesHtml"
     | "artigos"
     | "capa"
-    | "frio",
+    | "frio"
+    | "celular"
+    | "rtt"
+    | "downlink",
     number | boolean
   >
 >;
@@ -53,7 +56,20 @@ function dadosDaRequisicao(caminho: string) {
   return {};
 }
 
-function enviar(dados: object) {
+// Aparelho e conexão de quem está lendo (não identifica a pessoa).
+// rtt = tempo de ida e volta da internet; downlink = velocidade estimada (Mbps).
+// O navegador só informa a conexão no Chrome/Edge/Android.
+function aparelho(): Detalhes {
+  const conexao = (navigator as Navigator & { connection?: { rtt?: number; downlink?: number } }).connection;
+  return {
+    celular: window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768,
+    ...(typeof conexao?.rtt === "number" ? { rtt: conexao.rtt } : {}),
+    ...(typeof conexao?.downlink === "number" ? { downlink: conexao.downlink } : {}),
+  };
+}
+
+function enviar(dados: { detalhes?: Detalhes } & Record<string, unknown>) {
+  dados = { ...dados, detalhes: { ...aparelho(), ...dados.detalhes } };
   const url = `${API_URL}/metricas`;
   const corpo = JSON.stringify(dados);
   try {
