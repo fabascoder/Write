@@ -2,6 +2,12 @@ import { createServer } from "node:http";
 import { Router } from "./router.mjs";
 import { inicializarBanco } from "./database/database.mjs";
 import editorTextoRoutes from "./routes/editorTexto.route.mjs";
+import authRoutes from "./routes/auth.route.mjs";
+import usuarioRoutes from "./routes/usuario.route.mjs";
+import reacaoRoutes from "./routes/reacao.route.mjs";
+import metricaRoutes from "./routes/metrica.route.mjs";
+import engajamentoRoutes from "./routes/engajamento.route.mjs";
+import { registrarMetrica } from "./services/metrica.service.mjs";
 
 const router = new Router();
 
@@ -21,14 +27,66 @@ router.get("/", (req, res) => {
 // Rotas dos artigos
 editorTextoRoutes(router);
 
+// Contas, login e sessão
+authRoutes(router);
+
+// Gerenciamento de usuários (admin)
+usuarioRoutes(router);
+
+// Like e deslike nos artigos
+reacaoRoutes(router);
+
+// Desempenho do sistema
+metricaRoutes(router);
+
+// Tempo logado e tempo de leitura
+engajamentoRoutes(router);
+
+// Cronômetro de cada requisição:
+// - manda o tempo no cabeçalho Server-Timing (o navegador separa servidor x rede)
+// - guarda o tempo e o tamanho da resposta para o painel de desempenho
+function medirRequisicao(req, res) {
+  const inicio = performance.now();
+  let bytes = 0;
+
+  const writeHead = res.writeHead;
+  res.writeHead = function (...args) {
+    if (!res.headersSent) res.setHeader("Server-Timing", `app;dur=${(performance.now() - inicio).toFixed(1)}`);
+    return writeHead.apply(this, args);
+  };
+
+  const end = res.end;
+  res.end = function (pedaco, ...resto) {
+    if (pedaco && typeof pedaco !== "function") bytes += Buffer.byteLength(pedaco);
+    return end.call(this, pedaco, ...resto);
+  };
+
+  res.on("finish", () => {
+    // As próprias métricas não entram na conta, nem o "/" (é o que o serviço que
+    // mantém a API acordada chama a cada poucos minutos; ver README)
+    if (req.method === "OPTIONS" || req.rota === "/" || req.rota?.startsWith("/metricas") || req.rota === "/atividade" || req.rota === "/leituras") return;
+    registrarMetrica({
+      origem: "servidor",
+      acao: "api",
+      rota: req.rota ?? "(rota inexistente)",
+      metodo: req.method,
+      status: res.statusCode,
+      duracaoMs: performance.now() - inicio,
+      bytes,
+    });
+  });
+}
+
 // Criação do servidor
 const server = createServer(async (req, res) => {
+  medirRequisicao(req, res);
+
   // Configuração do CORS
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, DELETE",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE",
   );
 
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");

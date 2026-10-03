@@ -1,6 +1,7 @@
-import { useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 import { useArtigos } from "../../hooks/useArtigos";
-import { useAdmin } from "../../hooks/useAdmin";
+import { useAuth } from "../../hooks/useAuth";
+import { useMedirCarregamento } from "../../hooks/useMedirCarregamento";
 import { buscarCategoria, categoriaDe } from "../../lib/categorias";
 import { resumo } from "../../lib/format";
 import FeaturedView from "../home/FeaturedView";
@@ -8,15 +9,22 @@ import Sidebar from "../home/Sidebar";
 import TimelineView from "../home/TimelineView";
 import type { Visao } from "../home/ViewToggle";
 import AdminBar from "../admin/AdminBar";
-import ContaForm from "../admin/ContaForm";
 import Novidades from "../admin/Novidades";
 import ArtigoRow from "../home/ArtigoRow";
 import { Head } from "../layout/Head";
 
 export default function Home() {
   const { artigos, carregando, erro } = useArtigos();
-  const { logado } = useAdmin();
+  const { pode } = useAuth();
+  const logado = pode("artigos:gerenciar");
   const [params, setParams] = useSearchParams();
+
+  // Desempenho: até a lista de artigos aparecer
+  useMedirCarregamento("carregar_inicio", !carregando && !erro, async () => ({
+    status: 200,
+    caminho: "/documentos",
+    detalhes: { artigos: artigos.length },
+  }));
 
   const visao: Visao = params.get("visao") === "linha-do-tempo" ? "linha-do-tempo" : "destaques";
   const categoria = buscarCategoria(params.get("categoria"));
@@ -37,6 +45,10 @@ export default function Home() {
     else novos.delete(chave);
     setParams(novos, { replace: true });
   }
+
+  // Para o admin, a página inicial é o painel. Busca e categorias (com ?busca=,
+  // ?categoria=...) continuam abrindo a lista normalmente.
+  if (pode("admin:acessar") && !params.toString()) return <Navigate to="/admin" replace />;
 
   return (
     <main className="fc-main">
@@ -89,7 +101,6 @@ export default function Home() {
           )
         )}
 
-        {logado && <ContaForm />}
       </div>
     </main>
   );

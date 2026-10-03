@@ -197,3 +197,87 @@ export const CheckIcon = () => (
     <path d="m5 12.5 4.5 4.5L19 7.5" />
   </Icon>
 );
+
+export const ShieldIcon = () => (
+  <Icon>
+    <path d="M12 3 5 6v5.5c0 4.2 2.9 8 7 9.5 4.1-1.5 7-5.3 7-9.5V6Z" />
+    <path d="m9 12 2 2 4-4" />
+  </Icon>
+);
+
+export const BellIcon = () => (
+  <Icon>
+    <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15Z" />
+    <path d="M10 20.5a2.2 2.2 0 0 0 4 0" />
+  </Icon>
+);
+
+export const HeartIcon = () => (
+  <Icon>
+    <path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z" />
+  </Icon>
+);
+
+export const LogOutIcon = () => (
+  <Icon>
+    <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
+    <path d="M10 16l-4-4 4-4M6 12h10" />
+  </Icon>
+);
+
+// Marca do Google nas cores oficiais (padrão do botão "Continuar com Google")
+export const GoogleIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.5-.2-2.2H12v4.2h5.9a5 5 0 0 1-2.2 3.3v2.7h3.6c2.1-1.9 3.3-4.8 3.3-8Z" />
+    <path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.7c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.8A11 11 0 0 0 12 23Z" />
+    <path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 0 1 0-4.3V7.1H2.1a11 11 0 0 0 0 9.9Z" />
+    <path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7.1l3.7 2.8C6.7 7.3 9.1 5.4 12 5.4Z" />
+  </svg>
+);
+
+export const EyeIcon = () => (
+  <Icon>
+    <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
+    <circle cx="12" cy="12" r="3" />
+  </Icon>
+);
+
+export const EyeOffIcon = () => (
+  <Icon>
+    <path d="M9.9 5.7A9.6 9.6 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17 17 0 0 1-2.7 3.5M6.6 6.6C3.9 8.3 2.5 12 2.5 12S6 18.5 12 18.5c1.9 0 3.5-.6 4.9-1.5" />
+    <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+    <path d="m3 3 18 18" />
+  </Icon>
+);
+
+// Joinha (like) e o mesmo virado para baixo (deslike)
+export const ThumbUpIcon = () => (
+  <Icon>
+    <path d="M7 10.5V20H4.5a1.5 1.5 0 0 1-1.5-1.5V12a1.5 1.5 0 0 1 1.5-1.5H7Z" />
+    <path d="M7 10.5 10.8 3.6A2.3 2.3 0 0 1 14 5.6V9h5a2 2 0 0 1 2 2.3l-1.1 6.9A2.2 2.2 0 0 1 17.7 20H7" />
+  </Icon>
+);
+
+export const ThumbDownIcon = () => (
+  <Icon>
+    <g transform="rotate(180 12 12)">
+      <path d="M7 10.5V20H4.5a1.5 1.5 0 0 1-1.5-1.5V12a1.5 1.5 0 0 1 1.5-1.5H7Z" />
+      <path d="M7 10.5 10.8 3.6A2.3 2.3 0 0 1 14 5.6V9h5a2 2 0 0 1 2 2.3l-1.1 6.9A2.2 2.2 0 0 1 17.7 20H7" />
+    </g>
+  </Icon>
+);
+
+// Linha de batimento: desempenho do sistema
+export const ActivityIcon = () => (
+  <Icon>
+    <path d="M3 12h4l3-8 4 16 3-8h4" />
+  </Icon>
+);
+
+// Câmera: trocar a foto de perfil
+export const CameraIcon = () => (
+  <Icon>
+    <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.6-2.2h5.4L16.3 7h2.2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5Z" />
+    <circle cx="12" cy="12.8" r="3.4" />
+  </Icon>
+);

@@ -1,19 +1,24 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useArtigos } from "../../hooks/useArtigos";
-import { useAdmin } from "../../hooks/useAdmin";
+import { useAuth } from "../../hooks/useAuth";
+import { useMedirCarregamento } from "../../hooks/useMedirCarregamento";
+import { useTempoDeLeitura } from "../../hooks/useTempoDeLeitura";
+import { esperarImagens, imagensEmbutidas } from "../../lib/medicao";
 import { excluirArtigo } from "../../lib/api";
 import { dataPorExtenso, htmlLegivel, resumo, tempoRelativo } from "../../lib/format";
 import { ArrowLeftIcon, PenIcon, TrashIcon } from "../icons";
 import ConfirmDialog from "../layout/ConfirmDialog";
 import { Head } from "../layout/Head";
 import OptionsMenu from "../layout/OptionsMenu";
+import Reacoes from "../artigo/Reacoes";
 
 export default function Article() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { artigos, carregando, erro } = useArtigos();
-  const { logado } = useAdmin();
+  const { artigos, carregando, erro } = useArtigos({ id });
+  const { pode } = useAuth();
+  const logado = pode("artigos:gerenciar");
 
   const [confirmando, setConfirmando] = useState(false);
   const [excluindo, setExcluindo] = useState(false);
@@ -21,6 +26,28 @@ export default function Article() {
 
   // A API não tem GET por id, então o artigo é buscado na lista
   const artigo = artigos.find((a) => String(a.id) === id);
+
+  // Tempo de leitura (quem escreve não conta, senão a média do próprio autor entra)
+  useTempoDeLeitura(artigo?.id, Boolean(artigo) && !logado);
+
+  // Desempenho: do clique até o texto e as fotos aparecerem
+  useMedirCarregamento("abrir_artigo", Boolean(artigo), async () => {
+    const html = artigo?.conteudoHtml ?? "";
+    const fotos = await esperarImagens(document.querySelector(".fc-prosa"));
+    const embutidas = imagensEmbutidas(html);
+    return {
+      status: 200,
+      caminho: "/documentos",
+      detalhes: {
+        imagens: fotos.imagens,
+        imagensMs: fotos.imagensMs,
+        ...embutidas,
+        bytesImagens: embutidas.bytesImagensEmbutidas + fotos.bytesExternas,
+        palavras: (document.querySelector(".fc-prosa")?.textContent ?? "").split(/\s+/).filter(Boolean).length,
+        bytesHtml: html.length,
+      },
+    };
+  });
 
   function voltar() {
     if (window.history.length > 1) navigate(-1);
@@ -116,6 +143,8 @@ export default function Article() {
         </div>
 
         <div className="fc-prosa" dangerouslySetInnerHTML={{ __html: htmlLegivel(artigo.conteudoHtml) }} />
+
+        <Reacoes artigoId={artigo.id} />
       </article>
 
       <ConfirmDialog

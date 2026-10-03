@@ -22,7 +22,7 @@ function estaIncorporado() {
 export default function Embed() {
   const { id } = useParams();
   const [params] = useSearchParams();
-  const { artigos, carregando, erro } = useArtigos();
+  const { artigos, carregando, erro } = useArtigos({ id });
   const personalizacao = lerPersonalizacao(params);
   const incorporado = estaIncorporado();
 

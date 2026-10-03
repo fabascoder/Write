@@ -1,15 +1,11 @@
-import { useState } from "react";
+import { Suspense } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { useAdmin } from "../../hooks/useAdmin";
 import Header from "./Header";
 import Footer from "./Footer";
-import LoginModal from "./LoginModal";
 import SocialRail from "./SocialRail";
 
 export default function Layout() {
   const { pathname } = useLocation();
-  const { logado, logar, deslogar } = useAdmin();
-  const [login, setLogin] = useState(false);
 
   // O artigo aberto e o editor não levam rodapé
   const semRodape = pathname.startsWith("/artigo/") || pathname.startsWith("/editor");
@@ -19,12 +15,14 @@ export default function Layout() {
     <div className="fc-page">
       <div className="fc-container">
         <Header simples={cabecalhoSimples} />
-        <Outlet />
-        {!semRodape && <Footer logado={logado} abrirLogin={() => setLogin(true)} sair={deslogar} />}
+        {/* Páginas baixadas sob demanda (ver App.tsx): o cabeçalho fica parado enquanto chegam */}
+        <Suspense fallback={<main className="fc-main fc-main--simples"><p className="fc-estado">Carregando…</p></main>}>
+          <Outlet />
+        </Suspense>
+        {!semRodape && <Footer />}
       </div>
 
       <SocialRail />
-      <LoginModal aberto={login} fechar={() => setLogin(false)} entrar={logar} />
     </div>
   );
 }

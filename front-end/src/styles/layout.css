@@ -202,13 +202,14 @@
   gap: 24px;
   color: var(--azul);
 }
-.fc-social a {
+/* > a: só os ícones de redes, não os links do menu da conta que também ficam aqui */
+.fc-social > a {
   display: block;
   width: 26px;
   height: 26px;
   transition: transform 0.22s var(--suave), opacity 0.22s var(--suave);
 }
-.fc-social a:hover {
+.fc-social > a:hover {
   transform: translateY(-2px) scale(1.08);
   opacity: 0.85;
 }
@@ -971,3 +972,404 @@ html.fc-embed body { background: transparent; }
   background: var(--azul);
 }
 .fc-opcoes-botao { position: relative; }
+
+/* ---------- Formulário do perfil ---------- */
+.fc-form .fc-btn:disabled { opacity: 0.65; cursor: progress; }
+
+/* "Acesso negado": a caixa de modal no meio da página */
+.fc-auth-pagina {
+  display: grid;
+  place-items: start center;
+}
+.fc-auth-caixa {
+  margin-top: clamp(8px, 4vw, 40px);
+  border: 1px solid var(--linha-2);
+  box-shadow: 0 20px 50px rgba(16, 21, 28, 0.08);
+}
+
+/* Aviso no lugar de uma função que exige conta */
+.fc-precisa-entrar {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+  text-align: center;
+}
+.fc-precisa-entrar p { color: var(--tinta-2); }
+.fc-precisa-entrar div { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+
+/* ---------- Conta (foto de perfil + menu) ---------- */
+/* Desktop: na trilha da direita, acima do Instagram e do GitHub.
+   Celular: no cabeçalho, porque a trilha vai para o rodapé. */
+.fc-conta { position: relative; display: flex; flex-shrink: 0; }
+
+.fc-conta-botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: var(--titulo);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tinta);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.fc-conta-nome {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Foto padrão: círculo preto com a silhueta */
+.fc-avatar {
+  display: block;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  color: var(--tinta);
+  transition: transform 0.22s var(--suave), opacity 0.22s var(--suave);
+}
+/* Mesmo efeito dos ícones de redes sociais */
+.fc-conta-botao:hover .fc-avatar,
+.fc-conta-botao.is-open .fc-avatar {
+  transform: translateY(-2px) scale(1.08);
+  opacity: 0.85;
+}
+
+/* Na trilha: mesmo tamanho dos ícones de redes, alinhado pela direita,
+   e um respiro maior até o Instagram */
+.fc-social { justify-items: end; }
+.fc-conta--trilho { margin-bottom: 22px; }
+.fc-conta--trilho .fc-avatar { width: 26px; height: 26px; }
+.fc-conta--trilho .fc-opcoes-menu::before { right: 6px; } /* seta no meio do ícone */
+
+/* "Olá, Nome" ao lado da foto só quando sobra margem ao lado do conteúdo;
+   em telas menores ele cobriria os botões do artigo (o nome aparece no menu) */
+@media (max-width: 1399px) {
+  .fc-conta--trilho .fc-conta-nome { display: none; }
+}
+
+/* Nome e e-mail no topo do menu */
+.fc-conta-menu { min-width: 240px; }
+.fc-conta-quem {
+  display: grid;
+  gap: 2px;
+  margin: 2px 2px 8px;
+  padding: 4px 10px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+.fc-conta-quem strong { font-family: var(--titulo); font-size: 15px; font-weight: 600; }
+.fc-conta-quem span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+/* PT | EN dentro do menu ☰ só aparece no celular */
+.fc-lang--menu { display: none; }
+
+/* Cada lugar no seu tamanho de tela */
+.fc-conta--cabecalho { display: none; }
+
+@media (max-width: 900px) {
+  .fc-conta--trilho { display: none; }
+  .fc-conta--cabecalho { display: flex; }
+
+  /* Ordem no celular: marca … conta, PT | EN, ☰ */
+  .fc-header-nav ~ .fc-conta { order: 1; margin-left: auto; }
+  .fc-header-nav ~ .fc-lang { order: 2; }
+  .fc-header-nav ~ .fc-only-mobile { order: 3; margin-left: 0; }
+  .fc-header .fc-header-nav { order: 4; }
+}
+
+/* Celular estreito: não cabe tudo na linha de cima, então o idioma vai para o ☰
+   e a conta mostra só a foto (o nome aparece no topo do menu) */
+@media (max-width: 480px) {
+  .fc-header-nav ~ .fc-lang { display: none; }
+  .fc-header-nav .fc-lang--menu { display: flex; }
+  .fc-conta--cabecalho .fc-conta-nome { display: none; }
+}
+.fc-opcoes-item[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: default;
+}
+.fc-opcoes-item[aria-disabled="true"]:hover { background: none; }
+.fc-em-breve {
+  margin-left: auto;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-family: var(--texto);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------- Telas de entrar e cadastro (templates Desktop 8 e 9) ---------- */
+.fc-login {
+  min-height: 100dvh;
+  padding: clamp(40px, 8vh, 72px) 20px 64px;
+  background: var(--branco);
+  animation: fc-sobe 0.45s var(--suave) both;
+}
+.fc-login-coluna {
+  width: min(440px, 100%);
+  margin: 0 auto;
+}
+
+.fc-login-marca {
+  display: block;
+  text-align: center;
+  font-size: clamp(30px, 8vw, 40px);
+  letter-spacing: -0.02em;
+}
+
+.fc-login-titulo {
+  margin: clamp(36px, 7vh, 64px) 0 clamp(36px, 7vh, 56px);
+  font-family: var(--titulo);
+  font-size: clamp(21px, 5vw, 27px);
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--tinta);
+}
+/* Palavras em azul no título */
+.fc-login-titulo em {
+  font-style: normal;
+  color: var(--azul);
+}
+
+/* Motivo de ter vindo parar aqui (ex.: tentou curtir sem estar logado) */
+.fc-login-aviso {
+  margin: calc(clamp(36px, 7vh, 56px) * -0.5) 0 28px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: var(--azul-claro);
+  font-size: 14px;
+  text-align: center;
+  color: var(--azul-escuro);
+}
+
+.fc-login-form {
+  display: grid;
+  gap: 28px;
+}
+
+.fc-login-campo label {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--titulo);
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--tinta);
+}
+.fc-login-campo input {
+  width: 100%;
+  height: 52px;
+  padding: 0 14px;
+  border: 1.5px solid var(--tinta);
+  border-radius: 0;
+  background: var(--branco);
+  font-size: 16px; /* 16px evita o zoom automático no iPhone */
+  transition: border-color 0.2s var(--suave), box-shadow 0.2s var(--suave);
+}
+.fc-login-campo input:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px var(--azul-claro);
+}
+.fc-login-campo input[aria-invalid="true"] { border-color: var(--erro); }
+.fc-login-campo input[aria-invalid="true"]:focus { box-shadow: 0 0 0 3px #fdecea; }
+
+/* Senha com o olho dentro do campo */
+.fc-login-senha { position: relative; }
+.fc-login-senha input { padding-right: 56px; }
+.fc-login-olho {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--tinta);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.fc-login-olho:hover { background: var(--cinza); }
+
+.fc-login-erro {
+  margin-top: 6px;
+  font-size: 13.5px;
+  color: var(--erro);
+}
+.fc-login-erro--geral {
+  margin-top: -8px;
+  text-align: center;
+}
+
+.fc-login-botao {
+  height: 52px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--azul);
+  font-family: var(--titulo);
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s var(--suave), transform 0.15s var(--suave);
+}
+.fc-login-botao:hover { background: var(--azul-escuro); }
+.fc-login-botao:active { transform: translateY(1px); }
+.fc-login-botao:disabled { opacity: 0.7; cursor: progress; }
+.fc-login-botao--normal { letter-spacing: 0; }
+
+.fc-login-troca {
+  margin-top: 18px;
+  font-family: var(--titulo);
+  font-size: 15.5px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--tinta);
+}
+.fc-login-troca a { font-weight: 600; color: var(--azul); }
+.fc-login-troca a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.fc-login-google {
+  display: flex;
+  align-items: center;
+  height: 52px;
+  margin-top: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--tinta);
+  background: var(--branco);
+  font-family: var(--titulo);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--tinta);
+  transition: background 0.2s var(--suave);
+}
+.fc-login-google:hover { background: var(--cinza); }
+/* G em preto, como no template */
+.fc-login-google svg {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  filter: brightness(0);
+}
+.fc-login-google span {
+  flex: 1;
+  margin-right: 28px; /* compensa o ícone para o texto ficar no meio */
+  text-align: center;
+}
+
+/* ---------- Escolha de contas (/contas) ---------- */
+.fc-contas {
+  display: grid;
+  overflow: hidden;
+  border: 1.5px solid var(--linha);
+  border-radius: var(--raio);
+}
+.fc-conta-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--linha-2);
+  background: var(--branco);
+}
+.fc-conta-item:first-child { border-top: 0; }
+/* Conta de admin: borda azul e etiqueta */
+.fc-conta-item--admin {
+  box-shadow: inset 0 0 0 2px var(--azul);
+  border-radius: var(--raio);
+}
+.fc-conta-escolher {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+.fc-conta-escolher:disabled { cursor: default; }
+.fc-conta-escolher:not(:disabled):hover strong { color: var(--azul); }
+.fc-conta-iniciais {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--tinta);
+  font-family: var(--titulo);
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+}
+.fc-conta-item:not(.is-ativa) .fc-conta-iniciais { background: var(--tinta-3); }
+.fc-conta-item--admin .fc-conta-iniciais { background: var(--azul); }
+.fc-conta-dados { display: grid; gap: 1px; min-width: 0; }
+.fc-conta-linha { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.fc-conta-linha strong {
+  overflow: hidden;
+  font-size: 15.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.2s var(--suave);
+}
+.fc-conta-dados small { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; color: var(--tinta-3); }
+.fc-conta-on { color: var(--azul) !important; }
+.fc-conta-off { font-style: italic; }
+.fc-conta-etiqueta {
+  flex-shrink: 0;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--azul);
+  font-family: var(--texto);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.fc-contas-acoes { display: grid; gap: 12px; margin-top: 18px; }
+.fc-contas-outra { margin-top: 0; justify-content: center; }
+.fc-contas-outra span { margin-right: 0; }
+.fc-contas-todas {
+  height: 52px;
+  border: 1.5px solid var(--linha);
+  border-radius: 4px;
+  background: var(--cinza);
+  font-family: var(--titulo);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--erro);
+  cursor: pointer;
+  transition: background 0.2s var(--suave), border-color 0.2s var(--suave);
+}
+.fc-contas-todas:hover { border-color: var(--erro); background: #fdecea; }
+.fc-contas-todas:disabled { opacity: 0.6; cursor: progress; }
+
+/* Foto de perfil no lugar da silhueta / das iniciais */
+img.fc-avatar--foto { border-radius: 50%; object-fit: cover; background: var(--cinza); }
+img.fc-conta-foto { display: block; object-fit: cover; background: var(--cinza); }
