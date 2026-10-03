@@ -266,3 +266,10 @@ export const ThumbDownIcon = () => (
     </g>
   </Icon>
 );
+
+// Linha de batimento: desempenho do sistema
+export const ActivityIcon = () => (
+  <Icon>
+    <path d="M3 12h4l3-8 4 16 3-8h4" />
+  </Icon>
+);

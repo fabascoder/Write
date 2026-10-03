@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useArtigos } from "../../hooks/useArtigos";
 import { useAuth } from "../../hooks/useAuth";
+import { useMedirCarregamento } from "../../hooks/useMedirCarregamento";
+import { esperarImagens, imagensEmbutidas } from "../../lib/medicao";
 import { excluirArtigo } from "../../lib/api";
 import { dataPorExtenso, htmlLegivel, resumo, tempoRelativo } from "../../lib/format";
 import { ArrowLeftIcon, PenIcon, TrashIcon } from "../icons";
@@ -23,6 +25,25 @@ export default function Article() {
 
   // A API não tem GET por id, então o artigo é buscado na lista
   const artigo = artigos.find((a) => String(a.id) === id);
+
+  // Desempenho: do clique até o texto e as fotos aparecerem
+  useMedirCarregamento("abrir_artigo", Boolean(artigo), async () => {
+    const html = artigo?.conteudoHtml ?? "";
+    const fotos = await esperarImagens(document.querySelector(".fc-prosa"));
+    const embutidas = imagensEmbutidas(html);
+    return {
+      status: 200,
+      caminho: "/documentos",
+      detalhes: {
+        imagens: fotos.imagens,
+        imagensMs: fotos.imagensMs,
+        ...embutidas,
+        bytesImagens: embutidas.bytesImagensEmbutidas + fotos.bytesExternas,
+        palavras: (document.querySelector(".fc-prosa")?.textContent ?? "").split(/\s+/).filter(Boolean).length,
+        bytesHtml: html.length,
+      },
+    };
+  });
 
   function voltar() {
     if (window.history.length > 1) navigate(-1);

@@ -20,6 +20,13 @@ export const NOVIDADES: Novidade[] = [
     lancadoEm: "2026-10-03",
     meses: 1,
   },
+  {
+    id: "curtidas",
+    nome: "Curtidas",
+    descricao: "Like e deslike no fim dos artigos",
+    lancadoEm: "2026-10-03",
+    meses: 1,
+  },
 ];
 
 function inicio(n: Novidade) {

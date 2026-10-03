@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { ErroApi } from "../../lib/api";
+import { iniciarMedicao } from "../../lib/medicao";
 import {
   caminhoSeguro,
   comVoltar,
@@ -46,12 +47,17 @@ export default function Cadastro() {
     setErros(encontrados);
     if (temErros(encontrados)) return;
 
+    // Desempenho: do botão Cadastrar até a resposta
+    const medir = iniciarMedicao("cadastro");
+
     try {
       setEnviando(true);
       await cadastrar({ ...dados, nome: dados.nome.trim(), email: dados.email.trim() });
+      medir({ status: 201, caminho: "/auth/cadastro" });
       // Conta criada e já logada: vai para a página principal
       navigate(voltar || "/", { replace: true });
     } catch (e) {
+      medir({ status: e instanceof ErroApi ? e.status : 0, caminho: "/auth/cadastro" });
       const mensagem = e instanceof Error ? e.message : "Não foi possível criar a conta agora.";
       // E-mail repetido aparece embaixo do campo de e-mail
       setErros(e instanceof ErroApi && e.status === 409 ? { email: mensagem } : { geral: mensagem });

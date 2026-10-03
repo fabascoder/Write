@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { ErroApi } from "../../lib/api";
+import { iniciarMedicao } from "../../lib/medicao";
 import { aplicarReacao, buscarReacoes, reagir, type Reacoes as Totais, type Valor } from "../../lib/reacoes";
 import { ThumbDownIcon, ThumbUpIcon } from "../icons";
+import NovoSelo from "../layout/NovoSelo";
 import Toast from "../layout/Toast";
 
 // De quanto em quanto tempo busca os números de novo, para os likes
@@ -73,6 +75,10 @@ export default function Reacoes({ artigoId }: { artigoId: string | number }) {
       // Clicar no que já está marcado tira a reação
       const nova: Valor = totais.minha === valor ? 0 : valor;
 
+      // Desempenho: do clique até o servidor confirmar
+      const medir = iniciarMedicao("curtir");
+      const caminho = `/documentos/${artigoId}/reacao`;
+
       // Muda na tela na hora
       setTotais(aplicarReacao(totais, nova));
 
@@ -82,8 +88,10 @@ export default function Reacoes({ artigoId }: { artigoId: string | number }) {
       fila.current = fila.current.then(async () => {
         try {
           const confirmado = await reagir(artigoId, nova);
+          medir({ status: 200, caminho });
           if (clique === ultimoClique.current) setTotais(confirmado);
         } catch (e) {
+          medir({ status: e instanceof ErroApi ? e.status : 0, caminho });
           // Algo deu errado: busca o estado real no servidor
           buscarReacoes(artigoId).then(setTotais).catch(() => {});
           if (e instanceof ErroApi && e.status === 401) {
@@ -135,7 +143,10 @@ export default function Reacoes({ artigoId }: { artigoId: string | number }) {
 
   return (
     <section className="fc-reacoes" aria-label="Reações ao artigo">
-      <p className="fc-reacoes-pergunta">Gostou deste texto?</p>
+      <p className="fc-reacoes-pergunta">
+        Gostou deste texto?
+        <NovoSelo id="curtidas" />
+      </p>
 
       <div className="fc-reacoes-botoes">
         <button

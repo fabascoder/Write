@@ -25,6 +25,7 @@ export const PERMISSOES = {
     "comentarios:moderar",
     "notificacoes:enviar",
     "configuracoes:editar",
+    "desempenho:ver",
   ],
 };
 

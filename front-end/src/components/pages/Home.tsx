@@ -1,6 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import { useArtigos } from "../../hooks/useArtigos";
 import { useAuth } from "../../hooks/useAuth";
+import { useMedirCarregamento } from "../../hooks/useMedirCarregamento";
 import { buscarCategoria, categoriaDe } from "../../lib/categorias";
 import { resumo } from "../../lib/format";
 import FeaturedView from "../home/FeaturedView";
@@ -17,6 +18,13 @@ export default function Home() {
   const { pode } = useAuth();
   const logado = pode("artigos:gerenciar");
   const [params, setParams] = useSearchParams();
+
+  // Desempenho: até a lista de artigos aparecer
+  useMedirCarregamento("carregar_inicio", !carregando && !erro, async () => ({
+    status: 200,
+    caminho: "/documentos",
+    detalhes: { artigos: artigos.length },
+  }));
 
   const visao: Visao = params.get("visao") === "linha-do-tempo" ? "linha-do-tempo" : "destaques";
   const categoria = buscarCategoria(params.get("categoria"));

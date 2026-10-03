@@ -83,6 +83,23 @@ const POSTGRES = /*sql*/ `
     UNIQUE ("usuarioId", "documentoId")
   );
   CREATE INDEX IF NOT EXISTS reacoes_documento ON reacoes ("documentoId");
+
+  -- Desempenho: tempo de cada requisição (servidor) e de cada ação (navegador).
+  -- Guarda 30 dias. Não guarda quem fez a ação, só os números.
+  CREATE TABLE IF NOT EXISTS metricas (
+    id SERIAL PRIMARY KEY,
+    origem TEXT NOT NULL,
+    acao TEXT NOT NULL,
+    rota TEXT,
+    metodo TEXT,
+    status INTEGER,
+    "duracaoMs" REAL NOT NULL,
+    "servidorMs" REAL,
+    bytes INTEGER,
+    detalhes TEXT,
+    "dataCriacao" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+  CREATE INDEX IF NOT EXISTS metricas_acao_data ON metricas (acao, "dataCriacao");
 `;
 
 const SQLITE = /*sql*/ `
@@ -129,6 +146,21 @@ const SQLITE = /*sql*/ `
     UNIQUE (usuarioId, documentoId)
   );
   CREATE INDEX IF NOT EXISTS reacoes_documento ON reacoes (documentoId);
+
+  CREATE TABLE IF NOT EXISTS metricas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    origem TEXT NOT NULL,
+    acao TEXT NOT NULL,
+    rota TEXT,
+    metodo TEXT,
+    status INTEGER,
+    duracaoMs REAL NOT NULL,
+    servidorMs REAL,
+    bytes INTEGER,
+    detalhes TEXT,
+    dataCriacao TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS metricas_acao_data ON metricas (acao, dataCriacao);
 `;
 
 export async function inicializarBanco() {

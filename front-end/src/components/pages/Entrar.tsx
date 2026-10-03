@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { ErroApi } from "../../lib/api";
+import { iniciarMedicao } from "../../lib/medicao";
 import { caminhoSeguro, comVoltar, temErros, urlLoginGoogle, validarLogin, type ErrosForm } from "../../lib/autenticacao";
 import { AuthPagina, Campo } from "../auth/AuthPagina";
 import { GoogleIcon } from "../icons";
@@ -43,12 +44,17 @@ export default function Entrar() {
     setErros(encontrados);
     if (temErros(encontrados)) return;
 
+    // Desempenho: do botão Entrar até a resposta
+    const medir = iniciarMedicao("entrar");
+
     try {
       setEnviando(true);
       await entrar(email.trim(), senha);
+      medir({ status: 200, caminho: "/auth/login" });
       // Deu tudo certo: página principal (ou de volta para onde a pessoa estava)
       navigate(voltar || "/", { replace: true });
     } catch (e) {
+      medir({ status: e instanceof ErroApi ? e.status : 0, caminho: "/auth/login" });
       const mensagem = e instanceof Error ? e.message : "Não foi possível entrar agora.";
       setErros({ geral: e instanceof ErroApi && e.status === 401 ? "E-mail ou senha incorretos." : mensagem });
       setEnviando(false);

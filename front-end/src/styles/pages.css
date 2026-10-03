@@ -430,3 +430,202 @@
 @media (max-width: 480px) {
   .fc-reacoes-aviso { text-align: left; }
 }
+.fc-reacoes-pergunta { display: flex; align-items: center; gap: 8px; }
+
+/* ---------- Desempenho do sistema (admin) ---------- */
+.fc-desemp {
+  /* Cores de situação, só desta página */
+  --bom: #1f7a4d;
+  --bom-claro: #e6f4ec;
+  --atencao: #8a5a00;
+  --atencao-claro: #fdf3dc;
+  --ruim: var(--erro);
+  --ruim-claro: #fdecea;
+  max-width: 980px;
+}
+
+/* Texto só para leitor de tela */
+.fc-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.fc-desemp-controles { display: flex; align-items: center; gap: 10px; }
+.fc-desemp-controles select { width: auto; height: 40px; }
+
+/* Abas: rolam de lado no celular, sem empurrar a página */
+.fc-abas {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--linha-2);
+  scrollbar-width: thin;
+}
+.fc-aba {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-family: var(--titulo);
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--tinta-3);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s var(--suave), border-color 0.2s var(--suave);
+}
+.fc-aba:hover { color: var(--tinta); }
+.fc-aba[aria-selected="true"] { border-bottom-color: var(--azul); color: var(--azul); }
+.fc-aba-ponto { width: 8px; height: 8px; border-radius: 50%; background: var(--linha); }
+.fc-aba-ponto--bom { background: var(--bom); }
+.fc-aba-ponto--atencao { background: #e0a100; }
+.fc-aba-ponto--ruim { background: var(--ruim); }
+
+.fc-desemp-descricao { margin-bottom: 14px; font-size: 14.5px; color: var(--tinta-3); }
+
+/* Veredito: bom / atenção / ruim */
+.fc-veredito {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: var(--raio);
+  background: var(--cinza);
+}
+.fc-veredito strong { font-family: var(--titulo); font-size: 17px; font-weight: 600; }
+.fc-veredito p { margin-top: 2px; font-size: 14.5px; color: var(--tinta-2); }
+.fc-veredito-ponto {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--tinta-3);
+}
+.fc-veredito--bom { background: var(--bom-claro); }
+.fc-veredito--bom strong { color: var(--bom); }
+.fc-veredito--bom .fc-veredito-ponto { background: var(--bom); }
+.fc-veredito--atencao { background: var(--atencao-claro); }
+.fc-veredito--atencao strong { color: var(--atencao); }
+.fc-veredito--atencao .fc-veredito-ponto { background: #e0a100; }
+.fc-veredito--ruim { background: var(--ruim-claro); }
+.fc-veredito--ruim strong { color: var(--ruim); }
+.fc-veredito--ruim .fc-veredito-ponto { background: var(--ruim); }
+
+/* Números */
+.fc-numeros {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin: 16px 0 0;
+}
+.fc-numeros div {
+  padding: 14px 16px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+}
+.fc-numeros dt { font-size: 12.5px; color: var(--tinta-3); }
+.fc-numeros dd {
+  margin: 4px 0 0;
+  font-family: var(--titulo);
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.fc-desemp-bloco { margin-top: 28px; }
+
+/* Motivo + dica */
+.fc-problemas { display: grid; gap: 10px; }
+.fc-problemas li {
+  padding: 14px 16px;
+  border: 1px solid var(--linha-2);
+  border-left: 3px solid var(--azul);
+  border-radius: var(--raio);
+}
+.fc-problema-motivo { font-weight: 500; color: var(--tinta); }
+.fc-problema-dica { margin-top: 6px; font-size: 14.5px; line-height: 1.6; color: var(--tinta-2); }
+.fc-problema-dica strong { color: var(--azul); }
+
+/* Tabelas: rolam de lado dentro delas mesmas no celular */
+.fc-tabela-rolagem { overflow-x: auto; }
+.fc-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.fc-tabela th {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--linha);
+  font-size: 12.5px;
+  font-weight: 500;
+  text-align: left;
+  color: var(--tinta-3);
+  white-space: nowrap;
+}
+.fc-tabela td {
+  padding: 10px;
+  border-bottom: 1px solid var(--linha-2);
+  white-space: nowrap;
+}
+.fc-tabela-rota { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 13px; }
+
+.fc-tempo { font-weight: 600; }
+.fc-tempo--bom { color: var(--bom); }
+.fc-tempo--atencao { color: var(--atencao); }
+.fc-tempo--ruim { color: var(--ruim); }
+
+.fc-status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--cinza);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--tinta-3);
+  white-space: nowrap;
+}
+.fc-status--bom { background: var(--bom-claro); color: var(--bom); }
+.fc-status--atencao { background: var(--atencao-claro); color: var(--atencao); }
+.fc-status--ruim { background: var(--ruim-claro); color: var(--ruim); }
+
+/* Visão geral: uma linha por área */
+.fc-desemp-areas { display: grid; gap: 8px; margin-top: 18px; }
+.fc-desemp-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--linha-2);
+  border-radius: var(--raio);
+  background: var(--branco);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s var(--suave), background 0.2s var(--suave);
+}
+.fc-desemp-area:hover { border-color: var(--azul); background: var(--azul-claro); }
+.fc-desemp-area > span:first-child { display: grid; gap: 2px; min-width: 0; }
+.fc-desemp-area strong { font-family: var(--titulo); font-size: 15.5px; font-weight: 600; }
+.fc-desemp-area small { font-size: 13px; color: var(--tinta-3); }
+
+.fc-desemp-rota {
+  margin-top: 28px;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 14px;
+  color: var(--tinta-2);
+}
+.fc-desemp-rota + .fc-desemp-bloco { margin-top: 8px; }
+
+.fc-desemp-nota { margin-top: 36px; font-size: 13px; color: var(--tinta-3); }

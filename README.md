@@ -151,6 +151,10 @@ Ler é livre: artigos, compartilhamento e a página `/embed` não pedem login. A
 | `DELETE` | `/documentos/:id` | `artigos:gerenciar` | Apaga um artigo publicado |
 | `GET` | `/documentos/:id/reacoes` | público | Total de likes e deslikes (e a reação de quem está logado) |
 | `PUT` | `/documentos/:id/reacao` | logado | Like (`1`), deslike (`-1`) ou tirar a reação (`0`) |
+| `POST` | `/metricas` | público (limite por IP) | O site manda quanto tempo cada ação levou no navegador |
+| `GET` | `/metricas/resumo?dias=7` | `desempenho:ver` | Médias, medianas e tempos por ação e por rota, para o painel de desempenho |
+
+Toda resposta da API leva o cabeçalho `Server-Timing` com o tempo gasto dentro do servidor.
 | `POST` | `/auth/cadastro` | público | Cria conta de leitor e já entra (devolve o JWT) |
 | `POST` | `/auth/login` | público | Entra com e-mail e senha (devolve o JWT) |
 | `POST` | `/auth/logout` | público | Apaga o cookie do token |

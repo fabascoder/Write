@@ -12,6 +12,7 @@ import Perfil from "./components/pages/Perfil";
 import AdminPainel from "./components/pages/AdminPainel";
 import AdminArtigos from "./components/pages/AdminArtigos";
 import AdminUsuarios from "./components/pages/AdminUsuarios";
+import AdminDesempenho from "./components/pages/AdminDesempenho";
 import RotaProtegida from "./components/auth/RotaProtegida";
 
 // A sessão vale para o site todo (menos o /embed, que é só um cartão público)
@@ -46,6 +47,7 @@ export default function App() {
             <Route path="/admin" element={<RotaProtegida permissao="admin:acessar"><AdminPainel /></RotaProtegida>} />
             <Route path="/admin/artigos" element={<RotaProtegida permissao="artigos:gerenciar"><AdminArtigos /></RotaProtegida>} />
             <Route path="/admin/usuarios" element={<RotaProtegida permissao="usuarios:gerenciar"><AdminUsuarios /></RotaProtegida>} />
+            <Route path="/admin/desempenho" element={<RotaProtegida permissao="desempenho:ver"><AdminDesempenho /></RotaProtegida>} />
             <Route path="/editor" element={<RotaProtegida permissao="artigos:gerenciar"><Editor /></RotaProtegida>} />
             <Route path="/rascunhos" element={<RotaProtegida permissao="artigos:gerenciar"><Rascunhos /></RotaProtegida>} />
 
